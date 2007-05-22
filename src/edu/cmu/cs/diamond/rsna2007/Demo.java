@@ -1,5 +1,6 @@
 package edu.cmu.cs.diamond.rsna2007;
 
+import java.awt.BorderLayout;
 import java.awt.image.BufferedImage;
 import java.io.*;
 import java.util.ArrayList;
@@ -8,9 +9,13 @@ import java.util.regex.Matcher;
 import java.util.regex.Pattern;
 
 import javax.imageio.ImageIO;
+import javax.swing.Box;
+import javax.swing.JButton;
 import javax.swing.JFrame;
 
 public class Demo extends JFrame {
+    final private CaseViewer caseViewer = new CaseViewer();
+    
     public static void main(String[] args) {
         Demo m;
         try {
@@ -25,12 +30,33 @@ public class Demo extends JFrame {
     final private List<Case> cases = new ArrayList<Case>();
 
     public Demo(File file) throws IOException {
+        super("Diamond RSNA 2007");
+        
         readIndex(file);
 
-        // set up window
-
+        setupWindow();
+        
         // load initial case
     }
+
+    
+    
+    private void setupWindow() {
+        add(caseViewer);
+        
+        Box h = Box.createHorizontalBox();
+
+        JButton p = new JButton("Previous Case");
+        JButton n = new JButton("Next Case");
+        
+        h.add(p);
+        h.add(Box.createHorizontalGlue());
+        h.add(n);
+        
+        add(h, BorderLayout.SOUTH);
+    }
+
+
 
     private void readIndex(File file) throws FileNotFoundException, IOException {
         BufferedReader reader = new BufferedReader(new FileReader(file));
