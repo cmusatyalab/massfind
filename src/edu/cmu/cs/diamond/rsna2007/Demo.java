@@ -21,6 +21,7 @@ public class Demo extends JFrame {
         try {
             m = new Demo(new File(args[0]));
             m.setLocationByPlatform(true);
+            m.setDefaultCloseOperation(JFrame.EXIT_ON_CLOSE);
             m.setVisible(true);
         } catch (IOException e) {
             e.printStackTrace();
@@ -37,6 +38,8 @@ public class Demo extends JFrame {
         setupWindow();
         
         // load initial case
+        
+        pack();
     }
 
     
@@ -49,9 +52,11 @@ public class Demo extends JFrame {
         JButton p = new JButton("Previous Case");
         JButton n = new JButton("Next Case");
         
+        h.add(Box.createHorizontalGlue());
         h.add(p);
         h.add(Box.createHorizontalGlue());
         h.add(n);
+        h.add(Box.createHorizontalGlue());
         
         add(h, BorderLayout.SOUTH);
     }
