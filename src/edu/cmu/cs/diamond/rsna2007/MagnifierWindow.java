@@ -10,6 +10,8 @@ public class MagnifierWindow extends JWindow {
     protected class Magnifier extends JComponent {
         final private Font font = Font.decode(null);
 
+        private OneView lastView;
+
         final static private int BORDER_SIZE = 4;
 
         @Override
@@ -23,11 +25,13 @@ public class MagnifierWindow extends JWindow {
                     .getDeepestComponentAt(viewer, p.x, p.y);
 
             if (c instanceof OneView) {
-                OneView ov = (OneView) c;
-                Point p2 = SwingUtilities.convertPoint(viewer, p, ov);
+                lastView = (OneView) c;
+            }
+            if (lastView != null) {
+                Point p2 = SwingUtilities.convertPoint(viewer, p, lastView);
 
-                Image img = ov.getImage();
-                Point imgP = ov.getImagePoint(p2);
+                Image img = lastView.getImage();
+                Point imgP = lastView.getImagePoint(p2);
 
                 int half = getWidth() / 2;
 
@@ -39,7 +43,7 @@ public class MagnifierWindow extends JWindow {
                         sy2, null);
 
                 // draw label
-                String label = ov.getViewName();
+                String label = lastView.getViewName();
                 g.setFont(font);
                 FontMetrics fm = g.getFontMetrics();
                 int sw = SwingUtilities.computeStringWidth(fm, label);

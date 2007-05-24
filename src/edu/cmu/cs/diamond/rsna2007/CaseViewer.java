@@ -100,6 +100,8 @@ public class CaseViewer extends JPanel {
         hBox.add(c4);
 
         revalidate();
+        
+        magnifierWindow.repaint();
     }
 
     protected void updateMagnifierPosition(MouseEvent e) {
