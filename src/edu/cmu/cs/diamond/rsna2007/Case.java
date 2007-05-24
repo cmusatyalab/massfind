@@ -19,4 +19,24 @@ public class Case {
         
         this.name = name;
     }
+
+    public BufferedImage getLeftCC() {
+        return leftCC;
+    }
+
+    public BufferedImage getLeftML() {
+        return leftML;
+    }
+
+    public String getName() {
+        return name;
+    }
+
+    public BufferedImage getRightCC() {
+        return rightCC;
+    }
+
+    public BufferedImage getRightML() {
+        return rightML;
+    }
 }
