@@ -30,7 +30,7 @@ public class MagnifierWindow extends JWindow {
                 Point imgP = ov.getImagePoint(p2);
 
                 int half = getWidth() / 2;
-                
+
                 int sx1 = imgP.x - half;
                 int sx2 = imgP.x + half;
                 int sy1 = imgP.y - half;

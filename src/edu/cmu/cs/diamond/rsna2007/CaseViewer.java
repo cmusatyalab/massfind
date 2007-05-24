@@ -1,11 +1,13 @@
 package edu.cmu.cs.diamond.rsna2007;
 
-
 import java.awt.BorderLayout;
+import java.awt.Cursor;
 import java.awt.Dimension;
+import java.awt.Point;
 import java.awt.event.MouseAdapter;
 import java.awt.event.MouseEvent;
 import java.awt.event.MouseMotionAdapter;
+import java.awt.image.BufferedImage;
 
 import javax.swing.Box;
 import javax.swing.JPanel;
@@ -23,8 +25,12 @@ public class CaseViewer extends JPanel {
 
     private OneView c4;
 
+    final protected Cursor hiddenCursor = getToolkit().createCustomCursor(
+            new BufferedImage(1, 1, BufferedImage.TYPE_INT_ARGB), new Point(),
+            "null");
+
     final private Box hBox = Box.createHorizontalBox();
-    
+
     final protected MagnifierWindow magnifierWindow;
 
     public CaseViewer() {
@@ -39,14 +45,15 @@ public class CaseViewer extends JPanel {
         setPreferredSize(new Dimension(800, 600));
 
         setLayout(new BorderLayout());
-        
+
         add(hBox);
-        
+
         addMouseListener(new MouseAdapter() {
             @Override
             public void mousePressed(MouseEvent e) {
                 if (e.getButton() == 2) {
                     updateMagnifierPosition(e);
+                    setCursor(hiddenCursor);
                     magnifierWindow.setVisible(true);
                 }
             }
@@ -54,6 +61,7 @@ public class CaseViewer extends JPanel {
             @Override
             public void mouseReleased(MouseEvent e) {
                 if (e.getButton() == 2) {
+                    setCursor(null);
                     magnifierWindow.setVisible(false);
                 }
             }
