@@ -1,29 +1,22 @@
 package edu.cmu.cs.diamond.rsna2007;
 
-import java.awt.BorderLayout;
-import java.awt.Cursor;
-import java.awt.Dimension;
-import java.awt.Point;
-import java.awt.event.MouseAdapter;
-import java.awt.event.MouseEvent;
-import java.awt.event.MouseMotionAdapter;
+import java.awt.*;
+import java.awt.event.*;
 import java.awt.image.BufferedImage;
 
 import javax.swing.Box;
 import javax.swing.JPanel;
 
+import edu.cmu.cs.diamond.opendiamond.Util;
+
 public class CaseViewer extends JPanel {
     private final static int MAGNIFIER_SIZE = 512;
 
+    private final static int SPACING = 10;
+
     private Case theCase;
 
-    private OneView c1;
-
-    private OneView c2;
-
-    private OneView c3;
-
-    private OneView c4;
+    final private OneView views[] = new OneView[4];
 
     final protected Cursor hiddenCursor = getToolkit().createCustomCursor(
             new BufferedImage(1, 1, BufferedImage.TYPE_INT_ARGB), new Point(),
@@ -75,32 +68,57 @@ public class CaseViewer extends JPanel {
                 }
             }
         });
+
+        addComponentListener(new ComponentAdapter() {
+            @Override
+            public void componentResized(ComponentEvent e) {
+                super.componentResized(e);
+                updateScale();
+            }
+        });
     }
 
-    protected void repaintMagnifier(int x, int y) {
-        repaint(x - MAGNIFIER_SIZE / 2, y - MAGNIFIER_SIZE / 2, MAGNIFIER_SIZE,
-                MAGNIFIER_SIZE);
+    protected void updateScale() {
+        int width = 0;
+        int height = 0;
+
+        for (OneView view : views) {
+            BufferedImage img = view.getImage();
+            width += img.getWidth() + SPACING;
+            height = Math.max(img.getHeight(), height);
+        }
+        width -= SPACING;
+
+        Insets in = getInsets();
+        double scale = Util.getScaleForResize(width, height, getWidth()
+                - in.left - in.right, getHeight() - in.top - in.bottom);
+        
+        for (OneView view : views) {
+            view.setScale(scale);
+        }
+        
+        revalidate();
     }
 
     public void setCase(Case c) {
         theCase = c;
 
-        c1 = new OneView(theCase.getRightCC(), "RCC");
-        c2 = new OneView(theCase.getLeftCC(), "LCC");
-        c3 = new OneView(theCase.getRightML(), "RML");
-        c4 = new OneView(theCase.getLeftML(), "LML");
+        views[0] = new OneView(theCase.getRightCC(), "RCC");
+        views[1] = new OneView(theCase.getLeftCC(), "LCC");
+        views[2] = new OneView(theCase.getRightML(), "RML");
+        views[3] = new OneView(theCase.getLeftML(), "LML");
 
         hBox.removeAll();
-        hBox.add(c1);
-        hBox.add(Box.createHorizontalStrut(10));
-        hBox.add(c2);
-        hBox.add(Box.createHorizontalStrut(10));
-        hBox.add(c3);
-        hBox.add(Box.createHorizontalStrut(10));
-        hBox.add(c4);
+        hBox.add(views[0]);
+        hBox.add(Box.createHorizontalStrut(SPACING));
+        hBox.add(views[1]);
+        hBox.add(Box.createHorizontalStrut(SPACING));
+        hBox.add(views[2]);
+        hBox.add(Box.createHorizontalStrut(SPACING));
+        hBox.add(views[3]);
 
-        revalidate();
-        
+        updateScale();
+
         magnifierWindow.repaint();
     }
 
