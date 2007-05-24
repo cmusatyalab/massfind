@@ -3,6 +3,7 @@ package edu.cmu.cs.diamond.rsna2007;
 import java.awt.Graphics;
 import java.awt.Image;
 import java.awt.Insets;
+import java.awt.Point;
 import java.awt.event.ComponentAdapter;
 import java.awt.event.ComponentEvent;
 import java.awt.image.BufferedImage;
@@ -68,8 +69,12 @@ public class OneView extends JComponent {
         drawPosX = (w - scaledImg.getWidth()) / 2;
     }
 
-    public Image getMagnifiedImage(int magX, int magY, int magSize) {
-        return img.getSubimage((int) ((magX - drawPosX) / scale),
-                (int) ((magY - drawPosY) / scale), magSize, magSize);
+    public Image getImage() {
+        return img;
+    }
+
+    public Point getImagePoint(Point p) {
+        return new Point((int) ((p.x - drawPosX) / scale),
+                (int) ((p.y - drawPosY) / scale));
     }
 }

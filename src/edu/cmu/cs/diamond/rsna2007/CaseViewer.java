@@ -1,19 +1,17 @@
 package edu.cmu.cs.diamond.rsna2007;
 
-import java.awt.Component;
+
+import java.awt.BorderLayout;
 import java.awt.Dimension;
-import java.awt.Graphics;
-import java.awt.GridLayout;
-import java.awt.Point;
 import java.awt.event.MouseAdapter;
 import java.awt.event.MouseEvent;
 import java.awt.event.MouseMotionAdapter;
 
+import javax.swing.Box;
 import javax.swing.JPanel;
-import javax.swing.SwingUtilities;
 
 public class CaseViewer extends JPanel {
-    private final static int MAGNIFIER_SIZE = 256;
+    private final static int MAGNIFIER_SIZE = 512;
 
     private Case theCase;
 
@@ -25,38 +23,38 @@ public class CaseViewer extends JPanel {
 
     private OneView c4;
 
-    protected int magX;
-
-    protected int magY;
-
-    protected boolean magnifying;
+    final private Box hBox = Box.createHorizontalBox();
+    
+    final protected MagnifierWindow magnifierWindow;
 
     public CaseViewer() {
         super();
 
         setBackground(null);
 
-        setLayout(new GridLayout(1, 4, 5, 0));
+        magnifierWindow = new MagnifierWindow(this);
+        magnifierWindow.setSize(MAGNIFIER_SIZE, MAGNIFIER_SIZE);
 
         setMinimumSize(new Dimension(800, 600));
         setPreferredSize(new Dimension(800, 600));
 
+        setLayout(new BorderLayout());
+        
+        add(hBox);
+        
         addMouseListener(new MouseAdapter() {
             @Override
             public void mousePressed(MouseEvent e) {
                 if (e.getButton() == 2) {
-                    magnifying = true;
-                    magX = e.getX();
-                    magY = e.getY();
-                    repaintMagnifier(magX, magY);
+                    updateMagnifierPosition(e);
+                    magnifierWindow.setVisible(true);
                 }
             }
 
             @Override
             public void mouseReleased(MouseEvent e) {
                 if (e.getButton() == 2) {
-                    magnifying = false;
-                    repaintMagnifier(e.getX(), e.getY());
+                    magnifierWindow.setVisible(false);
                 }
             }
         });
@@ -64,11 +62,8 @@ public class CaseViewer extends JPanel {
         addMouseMotionListener(new MouseMotionAdapter() {
             @Override
             public void mouseDragged(MouseEvent e) {
-                if (magnifying) {
-                    repaintMagnifier(e.getX(), e.getY());
-                    magX = e.getX();
-                    magY = e.getY();
-                    repaintMagnifier(magX, magY);
+                if (magnifierWindow.isVisible()) {
+                    updateMagnifierPosition(e);
                 }
             }
         });
@@ -87,30 +82,21 @@ public class CaseViewer extends JPanel {
         c3 = new OneView(theCase.getLeftML());
         c4 = new OneView(theCase.getRightML());
 
-        removeAll();
-        add(c1);
-        add(c2);
-        add(c3);
-        add(c4);
+        hBox.removeAll();
+        hBox.add(c1);
+        hBox.add(Box.createHorizontalStrut(10));
+        hBox.add(c2);
+        hBox.add(Box.createHorizontalStrut(10));
+        hBox.add(c3);
+        hBox.add(Box.createHorizontalStrut(10));
+        hBox.add(c4);
 
         revalidate();
     }
 
-    @Override
-    protected void paintComponent(Graphics g) {
-        super.paintComponent(g);
-
-        // magnify
-        if (magnifying) {
-            Component c = SwingUtilities
-                    .getDeepestComponentAt(this, magX, magY);
-            if (c instanceof OneView) {
-                OneView o = (OneView) c;
-                Point p = SwingUtilities.convertPoint(this, magX, magY, c);
-                g.drawImage(o.getMagnifiedImage(p.x, p.y, MAGNIFIER_SIZE),
-                        magX - MAGNIFIER_SIZE / 2, magY - MAGNIFIER_SIZE / 2,
-                        null);
-            }
-        }
+    protected void updateMagnifierPosition(MouseEvent e) {
+        magnifierWindow.setLocation(e.getX() - MAGNIFIER_SIZE / 2, e.getY()
+                - MAGNIFIER_SIZE / 2);
+        magnifierWindow.repaint();
     }
 }
