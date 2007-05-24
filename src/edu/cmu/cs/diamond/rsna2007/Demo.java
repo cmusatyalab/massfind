@@ -1,10 +1,17 @@
 package edu.cmu.cs.diamond.rsna2007;
 
 import java.awt.BorderLayout;
+import java.awt.Color;
+import java.awt.GraphicsDevice;
+import java.awt.GraphicsEnvironment;
 import java.awt.event.ActionEvent;
 import java.awt.event.ActionListener;
 import java.awt.image.BufferedImage;
-import java.io.*;
+import java.io.BufferedReader;
+import java.io.File;
+import java.io.FileNotFoundException;
+import java.io.FileReader;
+import java.io.IOException;
 import java.util.ArrayList;
 import java.util.List;
 import java.util.regex.Matcher;
@@ -14,40 +21,53 @@ import javax.imageio.ImageIO;
 import javax.swing.Box;
 import javax.swing.JButton;
 import javax.swing.JFrame;
+import javax.swing.JLabel;
 
 public class Demo extends JFrame {
     final private CaseViewer caseViewer = new CaseViewer();
 
     final private List<Case> cases = new ArrayList<Case>();
-    
+
     final private JButton prevButton = new JButton("Previous Case");
+
     final private JButton nextButton = new JButton("Next Case");
 
-    
-    private int currentCase = 0;
+    protected int currentCase = 0;
+
+    final private JLabel caseLabel = new JLabel();
 
     public static void main(String[] args) {
         Demo m;
+
+        GraphicsDevice gd = GraphicsEnvironment.getLocalGraphicsEnvironment()
+                .getDefaultScreenDevice();
+
         try {
             m = new Demo(new File(args[0]));
-            m.setLocationByPlatform(true);
+            m.setUndecorated(true);
+            gd.setFullScreenWindow(m);
+            // m.setLocationByPlatform(true);
+            // m.setVisible(true);
             m.setDefaultCloseOperation(JFrame.EXIT_ON_CLOSE);
-            m.setVisible(true);
         } catch (IOException e) {
             e.printStackTrace();
+        } finally {
+            gd.setFullScreenWindow(null);
         }
     }
 
     public Demo(File file) throws IOException {
         super("Diamond RSNA 2007");
 
+        setBackground(Color.BLACK);
+        
+        getContentPane().setBackground(Color.BLACK);
+
         readIndex(file);
 
         setupWindow();
 
         updateButtonAndCaseState();
-
-        pack();
     }
 
     private void setupWindow() {
@@ -58,21 +78,23 @@ public class Demo extends JFrame {
         prevButton.addActionListener(new ActionListener() {
             public void actionPerformed(ActionEvent e) {
                 currentCase--;
-                
+
                 updateButtonAndCaseState();
             }
         });
-        
+
         nextButton.addActionListener(new ActionListener() {
             public void actionPerformed(ActionEvent e) {
                 currentCase++;
-                
+
                 updateButtonAndCaseState();
             }
         });
 
         h.add(Box.createHorizontalGlue());
         h.add(prevButton);
+        h.add(Box.createHorizontalGlue());
+        h.add(caseLabel);
         h.add(Box.createHorizontalGlue());
         h.add(nextButton);
         h.add(Box.createHorizontalGlue());
@@ -83,10 +105,12 @@ public class Demo extends JFrame {
     protected void updateButtonAndCaseState() {
         prevButton.setEnabled(currentCase != 0);
         nextButton.setEnabled(currentCase != cases.size() - 1);
-        
-        caseViewer.setCase(cases.get(currentCase));
-        
-        validate();
+
+        Case c = cases.get(currentCase);
+        caseLabel.setText(c.getName());
+        caseViewer.setCase(c);
+
+//        validate();
     }
 
     private void readIndex(File file) throws FileNotFoundException, IOException {
