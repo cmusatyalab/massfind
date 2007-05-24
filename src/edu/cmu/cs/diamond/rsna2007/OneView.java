@@ -23,12 +23,16 @@ public class OneView extends JComponent {
 
     private double scale;
 
-    public OneView(BufferedImage img) {
+    final private String viewName;
+
+    public OneView(BufferedImage img, String viewName) {
         super();
 
         setBackground(null);
 
         this.img = img;
+        
+        this.viewName = viewName;
 
         addComponentListener(new ComponentAdapter() {
             @Override
@@ -76,5 +80,9 @@ public class OneView extends JComponent {
     public Point getImagePoint(Point p) {
         return new Point((int) ((p.x - drawPosX) / scale),
                 (int) ((p.y - drawPosY) / scale));
+    }
+    
+    public String getViewName() {
+        return viewName;
     }
 }

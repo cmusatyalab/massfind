@@ -85,10 +85,10 @@ public class CaseViewer extends JPanel {
     public void setCase(Case c) {
         theCase = c;
 
-        c1 = new OneView(theCase.getLeftCC());
-        c2 = new OneView(theCase.getRightCC());
-        c3 = new OneView(theCase.getLeftML());
-        c4 = new OneView(theCase.getRightML());
+        c1 = new OneView(theCase.getLeftCC(), "LCC");
+        c2 = new OneView(theCase.getRightCC(), "RCC");
+        c3 = new OneView(theCase.getLeftML(), "LML");
+        c4 = new OneView(theCase.getRightML(), "RML");
 
         hBox.removeAll();
         hBox.add(c1);
