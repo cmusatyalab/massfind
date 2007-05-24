@@ -1,10 +1,6 @@
 package edu.cmu.cs.diamond.rsna2007;
 
-import java.awt.Color;
-import java.awt.Component;
-import java.awt.Graphics;
-import java.awt.Image;
-import java.awt.Point;
+import java.awt.*;
 
 import javax.swing.JComponent;
 import javax.swing.JWindow;
@@ -38,6 +34,12 @@ public class MagnifierWindow extends JWindow {
                 g.drawImage(img, 0, 0, getWidth(), getHeight(), sx1, sy1, sx2,
                         sy2, null);
             }
+            
+            // draw border
+            Graphics2D g2 = (Graphics2D) g;
+            g2.setColor(Color.GRAY);
+            g2.setStroke(new BasicStroke(4));
+            g2.drawRect(2, 2, getWidth()-4, getHeight()-4);
         }
     }
 

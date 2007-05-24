@@ -1,9 +1,6 @@
 package edu.cmu.cs.diamond.rsna2007;
 
-import java.awt.BorderLayout;
-import java.awt.Color;
-import java.awt.GraphicsDevice;
-import java.awt.GraphicsEnvironment;
+import java.awt.*;
 import java.awt.event.ActionEvent;
 import java.awt.event.ActionListener;
 import java.awt.image.BufferedImage;
@@ -44,15 +41,19 @@ public class Demo extends JFrame {
 
         try {
             m = new Demo(new File(args[0]));
-            m.setUndecorated(true);
-            gd.setFullScreenWindow(m);
-            // m.setLocationByPlatform(true);
-            // m.setVisible(true);
             m.setDefaultCloseOperation(JFrame.EXIT_ON_CLOSE);
+
+            m.setUndecorated(true);
+            m.setResizable(false);
+
+            DisplayMode dm = gd.getDisplayMode();
+            m.setBounds(0, 0, dm.getWidth(), dm.getHeight());
+            m.setVisible(true);
+            m.toFront();
+            
+            m.validate();
         } catch (IOException e) {
             e.printStackTrace();
-        } finally {
-            gd.setFullScreenWindow(null);
         }
     }
 
@@ -91,6 +92,8 @@ public class Demo extends JFrame {
             }
         });
 
+        caseLabel.setForeground(Color.WHITE);
+        
         h.add(Box.createHorizontalGlue());
         h.add(prevButton);
         h.add(Box.createHorizontalGlue());

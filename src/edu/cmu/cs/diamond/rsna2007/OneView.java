@@ -44,9 +44,9 @@ public class OneView extends JComponent {
         super.paintComponent(g);
 
         if (scaledImg == null) {
-            System.out.println("drawing scaled image");
+//            System.out.println("drawing scaled image");
             drawScaledImg();
-            System.out.println("done");
+//            System.out.println("done");
         }
 
         g.drawImage(scaledImg, drawPosX, drawPosY, null);
