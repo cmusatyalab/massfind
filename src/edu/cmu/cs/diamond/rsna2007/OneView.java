@@ -1,6 +1,7 @@
 package edu.cmu.cs.diamond.rsna2007;
 
 import java.awt.Graphics;
+import java.awt.Image;
 import java.awt.Insets;
 import java.awt.event.ComponentAdapter;
 import java.awt.event.ComponentEvent;
@@ -19,11 +20,13 @@ public class OneView extends JComponent {
 
     private int drawPosX;
 
+    private double scale;
+
     public OneView(BufferedImage img) {
         super();
-        
+
         setBackground(null);
-        
+
         this.img = img;
 
         addComponentListener(new ComponentAdapter() {
@@ -53,8 +56,7 @@ public class OneView extends JComponent {
         final int w = getWidth() - in.left - in.right;
         final int h = getHeight() - in.top - in.bottom;
 
-        final double scale = Util.getScaleForResize(img.getWidth(), img.getHeight(),
-                w, h);
+        scale = Util.getScaleForResize(img.getWidth(), img.getHeight(), w, h);
 
         scaledImg = getGraphicsConfiguration()
                 .createCompatibleImage((int) (img.getWidth() * scale),
@@ -64,5 +66,10 @@ public class OneView extends JComponent {
 
         // center in X
         drawPosX = (w - scaledImg.getWidth()) / 2;
+    }
+
+    public Image getMagnifiedImage(int magX, int magY, int magSize) {
+        return img.getSubimage((int) ((magX - drawPosX) / scale),
+                (int) ((magY - drawPosY) / scale), magSize, magSize);
     }
 }
