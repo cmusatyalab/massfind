@@ -1,11 +1,20 @@
 package edu.cmu.cs.diamond.rsna2007;
 
-import java.awt.*;
-import java.awt.event.*;
+import java.awt.BorderLayout;
+import java.awt.Cursor;
+import java.awt.Dimension;
+import java.awt.Insets;
+import java.awt.Point;
+import java.awt.event.ComponentAdapter;
+import java.awt.event.ComponentEvent;
+import java.awt.event.MouseAdapter;
+import java.awt.event.MouseEvent;
+import java.awt.event.MouseMotionAdapter;
 import java.awt.image.BufferedImage;
 
 import javax.swing.Box;
 import javax.swing.JPanel;
+import javax.swing.SwingUtilities;
 
 import edu.cmu.cs.diamond.opendiamond.Util;
 
@@ -26,10 +35,16 @@ public class CaseViewer extends JPanel {
 
     final protected MagnifierWindow magnifierWindow;
 
+    private double scale;
+
+    final protected Cursor defaultCursor = new Cursor(Cursor.CROSSHAIR_CURSOR);
+
     public CaseViewer() {
         super();
 
         setBackground(null);
+
+        setCursor(defaultCursor);
 
         magnifierWindow = new MagnifierWindow(this);
         magnifierWindow.setSize(MAGNIFIER_SIZE, MAGNIFIER_SIZE);
@@ -54,7 +69,7 @@ public class CaseViewer extends JPanel {
             @Override
             public void mouseReleased(MouseEvent e) {
                 if (e.getButton() == 2) {
-                    setCursor(null);
+                    setCursor(defaultCursor);
                     magnifierWindow.setVisible(false);
                 }
             }
@@ -74,6 +89,8 @@ public class CaseViewer extends JPanel {
             public void componentResized(ComponentEvent e) {
                 super.componentResized(e);
                 updateScale();
+                
+                System.out.println(e);
             }
         });
     }
@@ -82,22 +99,26 @@ public class CaseViewer extends JPanel {
         int width = 0;
         int height = 0;
 
+//        revalidate();
+
         for (OneView view : views) {
             BufferedImage img = view.getImage();
-            width += img.getWidth() + SPACING;
+            width += img.getWidth();
             height = Math.max(img.getHeight(), height);
         }
-        width -= SPACING;
 
         Insets in = getInsets();
-        double scale = Util.getScaleForResize(width, height, getWidth()
-                - in.left - in.right, getHeight() - in.top - in.bottom);
-        
+
+        scale = Util.getScaleForResize(width, height, getWidth() - in.left
+                - in.right - (SPACING * (views.length - 1)), getHeight()
+                - in.top - in.bottom);
+
+        System.out.println(scale);
         for (OneView view : views) {
             view.setScale(scale);
         }
-        
-        revalidate();
+
+        repaint();
     }
 
     public void setCase(Case c) {
@@ -123,8 +144,18 @@ public class CaseViewer extends JPanel {
     }
 
     protected void updateMagnifierPosition(MouseEvent e) {
-        magnifierWindow.setLocation(e.getX() - MAGNIFIER_SIZE / 2, e.getY()
+        Point p = new Point(e.getX(), e.getY());
+        SwingUtilities.convertPointToScreen(p, e.getComponent());
+        magnifierWindow.setLocation(p.x - MAGNIFIER_SIZE / 2, p.y
                 - MAGNIFIER_SIZE / 2);
         magnifierWindow.repaint();
+    }
+
+    public OneView[] getViews() {
+        return views;
+    }
+
+    public double getScale() {
+        return scale;
     }
 }

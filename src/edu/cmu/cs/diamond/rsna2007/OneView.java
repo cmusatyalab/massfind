@@ -52,6 +52,7 @@ public class OneView extends JComponent {
                 (int) (scale * img.getHeight()));
         setMinimumSize(d);
         setPreferredSize(d);
+        revalidate();
     }
 
     private void drawScaledImg() {

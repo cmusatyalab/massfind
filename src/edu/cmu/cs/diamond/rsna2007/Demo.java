@@ -50,8 +50,6 @@ public class Demo extends JFrame {
             m.setBounds(0, 0, dm.getWidth(), dm.getHeight());
             m.setVisible(true);
             m.toFront();
-            
-            m.validate();
         } catch (IOException e) {
             e.printStackTrace();
         }
@@ -59,6 +57,8 @@ public class Demo extends JFrame {
 
     public Demo(File file) throws IOException {
         super("Diamond RSNA 2007");
+        
+        setMinimumSize(new Dimension(640, 480));
 
         setBackground(Color.BLACK);
         
@@ -113,7 +113,7 @@ public class Demo extends JFrame {
         caseLabel.setText(c.getName());
         caseViewer.setCase(c);
 
-//        validate();
+        validate();
     }
 
     private void readIndex(File file) throws FileNotFoundException, IOException {

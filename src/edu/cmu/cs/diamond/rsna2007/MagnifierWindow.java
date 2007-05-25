@@ -10,40 +10,41 @@ public class MagnifierWindow extends JWindow {
     protected class Magnifier extends JComponent {
         final private Font font = Font.decode(null);
 
-        private OneView lastView;
-
         final static private int BORDER_SIZE = 4;
 
         @Override
         protected void paintComponent(Graphics g) {
             super.paintComponent(g);
 
-            // get the component to draw
-            Point p = SwingUtilities.convertPoint(this, getWidth() / 2,
+            // figure out rectangle
+            Point cP = SwingUtilities.convertPoint(this, getWidth() / 2,
                     getHeight() / 2, viewer);
-            Component c = SwingUtilities
-                    .getDeepestComponentAt(viewer, p.x, p.y);
+            Rectangle rect = SwingUtilities.convertRectangle(this, getBounds(),
+                    viewer);
 
-            if (c instanceof OneView) {
-                lastView = (OneView) c;
+            // get all components
+            int half = getWidth() / 2;
+
+            for (OneView ov : viewer.getViews()) {
+                if (ov.getBounds().intersects(rect)) {
+                    Point p2 = SwingUtilities.convertPoint(viewer, cP, ov);
+
+                    Image img = ov.getImage();
+                    Point imgP = ov.getImagePoint(p2);
+
+                    int sx = imgP.x - half;
+                    int sy = imgP.y - half;
+                    g.drawImage(img, -sx, -sy, null);
+                }
             }
-            if (lastView != null) {
-                Point p2 = SwingUtilities.convertPoint(viewer, p, lastView);
 
-                Image img = lastView.getImage();
-                Point imgP = lastView.getImagePoint(p2);
+            // draw label
+            Component c = SwingUtilities.getDeepestComponentAt(viewer, cP.x,
+                    cP.y);
+            if (c instanceof OneView) {
+                OneView centerView = (OneView) c;
 
-                int half = getWidth() / 2;
-
-                int sx1 = imgP.x - half;
-                int sx2 = imgP.x + half;
-                int sy1 = imgP.y - half;
-                int sy2 = imgP.y + half;
-                g.drawImage(img, 0, 0, getWidth(), getHeight(), sx1, sy1, sx2,
-                        sy2, null);
-
-                // draw label
-                String label = lastView.getViewName();
+                String label = centerView.getViewName();
                 g.setFont(font);
                 FontMetrics fm = g.getFontMetrics();
                 int sw = SwingUtilities.computeStringWidth(fm, label);
@@ -63,6 +64,13 @@ public class MagnifierWindow extends JWindow {
             g2.setStroke(new BasicStroke(BORDER_SIZE));
             g2.drawRect(BORDER_SIZE / 2, BORDER_SIZE / 2, getWidth()
                     - BORDER_SIZE, getHeight() - BORDER_SIZE);
+
+            // draw center
+            if (false) {
+                g2.setStroke(new BasicStroke());
+                g.setColor(Color.RED);
+                g.drawArc(half - 2, half - 2, 4, 4, 0, 360);
+            }
         }
     }
 
