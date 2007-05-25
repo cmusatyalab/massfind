@@ -99,8 +99,6 @@ public class CaseViewer extends JPanel {
         int width = 0;
         int height = 0;
 
-//        revalidate();
-
         for (OneView view : views) {
             BufferedImage img = view.getImage();
             width += img.getWidth();
