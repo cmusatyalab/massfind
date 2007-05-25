@@ -89,8 +89,6 @@ public class CaseViewer extends JPanel {
             public void componentResized(ComponentEvent e) {
                 super.componentResized(e);
                 updateScale();
-                
-                System.out.println(e);
             }
         });
     }
@@ -111,7 +109,6 @@ public class CaseViewer extends JPanel {
                 - in.right - (SPACING * (views.length - 1)), getHeight()
                 - in.top - in.bottom);
 
-        System.out.println(scale);
         for (OneView view : views) {
             view.setScale(scale);
         }
