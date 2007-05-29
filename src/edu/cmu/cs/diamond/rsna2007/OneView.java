@@ -63,7 +63,7 @@ public class OneView extends JComponent {
                 .createCompatibleImage((int) (img.getWidth() * scale),
                         (int) (img.getHeight() * scale));
 
-        Util.scaleImage(img, scale, scaledImg, false);
+        Util.scaleImage(img, scaledImg, false);
 
         // center in X
         drawPosX = (w - scaledImg.getWidth()) / 2;
