@@ -27,9 +27,9 @@ public class CaseViewer extends JPanel {
 
     final private OneView views[] = new OneView[4];
 
-    final protected Cursor hiddenCursor = getToolkit().createCustomCursor(
-            new BufferedImage(1, 1, BufferedImage.TYPE_INT_ARGB), new Point(),
-            "null");
+    final Cursor hiddenCursor = getToolkit().createCustomCursor(
+            new BufferedImage(1, 1, BufferedImage.TYPE_BYTE_BINARY),
+            new Point(), "Hidden Cursor");
 
     final private Box hBox = Box.createHorizontalBox();
 
@@ -87,7 +87,6 @@ public class CaseViewer extends JPanel {
         addComponentListener(new ComponentAdapter() {
             @Override
             public void componentResized(ComponentEvent e) {
-                super.componentResized(e);
                 updateScale();
             }
         });
@@ -124,6 +123,8 @@ public class CaseViewer extends JPanel {
         views[2] = new OneView(theCase.getRightML(), "RML");
         views[3] = new OneView(theCase.getLeftML(), "LML");
 
+        updateScale();
+
         hBox.removeAll();
         hBox.add(views[0]);
         hBox.add(Box.createHorizontalStrut(SPACING));
@@ -133,7 +134,7 @@ public class CaseViewer extends JPanel {
         hBox.add(Box.createHorizontalStrut(SPACING));
         hBox.add(views[3]);
 
-        updateScale();
+        hBox.revalidate();
 
         magnifierWindow.repaint();
     }
