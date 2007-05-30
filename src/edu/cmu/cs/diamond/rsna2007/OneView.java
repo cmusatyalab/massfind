@@ -16,7 +16,7 @@ public class OneView extends JComponent {
 
     private int drawPosX;
 
-    private double scale = 1.0;
+    private double scale;
 
     final private String viewName;
 
@@ -44,13 +44,17 @@ public class OneView extends JComponent {
     }
 
     public void setScale(double scale) {
+        if (scale <= 0) {
+            throw new IllegalArgumentException("Scale (" + scale
+                    + ") cannot be <= 0");
+        }
+
         this.scale = scale;
 
         scaledImg = null;
 
         Dimension d = new Dimension((int) (scale * img.getWidth()),
                 (int) (scale * img.getHeight()));
-        setMinimumSize(d);
         setPreferredSize(d);
         revalidate();
     }
@@ -59,9 +63,10 @@ public class OneView extends JComponent {
         Insets in = getInsets();
         final int w = getWidth() - in.left - in.right;
 
-        scaledImg = getGraphicsConfiguration()
-                .createCompatibleImage((int) (img.getWidth() * scale),
-                        (int) (img.getHeight() * scale));
+        final int ww = (int) (img.getWidth() * scale);
+        final int hh = (int) (img.getHeight() * scale);
+
+        scaledImg = getGraphicsConfiguration().createCompatibleImage(ww, hh);
 
         Util.scaleImage(img, scaledImg, false);
 
