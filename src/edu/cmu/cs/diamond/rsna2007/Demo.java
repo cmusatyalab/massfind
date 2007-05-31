@@ -43,8 +43,8 @@ public class Demo extends JFrame {
             m = new Demo(new File(args[0]));
             m.setDefaultCloseOperation(JFrame.EXIT_ON_CLOSE);
 
-            m.setUndecorated(true);
-            m.setResizable(false);
+//            m.setUndecorated(true);
+//            m.setResizable(false);
 
             DisplayMode dm = gd.getDisplayMode();
             m.setBounds(0, 0, dm.getWidth(), dm.getHeight());

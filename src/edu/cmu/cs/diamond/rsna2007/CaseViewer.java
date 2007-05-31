@@ -1,22 +1,15 @@
 package edu.cmu.cs.diamond.rsna2007;
 
-import java.awt.BorderLayout;
 import java.awt.Cursor;
-import java.awt.Dimension;
-import java.awt.Insets;
 import java.awt.Point;
-import java.awt.event.ComponentAdapter;
-import java.awt.event.ComponentEvent;
 import java.awt.event.MouseAdapter;
 import java.awt.event.MouseEvent;
 import java.awt.event.MouseMotionAdapter;
 import java.awt.image.BufferedImage;
 
-import javax.swing.Box;
 import javax.swing.JPanel;
+import javax.swing.SpringLayout;
 import javax.swing.SwingUtilities;
-
-import edu.cmu.cs.diamond.opendiamond.Util;
 
 public class CaseViewer extends JPanel {
     private final static int MAGNIFIER_SIZE = 512;
@@ -28,14 +21,12 @@ public class CaseViewer extends JPanel {
     final private OneView views[] = new OneView[4];
 
     final Cursor hiddenCursor = getToolkit().createCustomCursor(
-            new BufferedImage(1, 1, BufferedImage.TYPE_BYTE_BINARY),
+            new BufferedImage(1, 1, BufferedImage.TYPE_INT_ARGB),
             new Point(), "Hidden Cursor");
-
-    final private Box hBox = Box.createHorizontalBox();
 
     final protected MagnifierWindow magnifierWindow;
 
-    private double scale;
+    final private SpringLayout layout = new SpringLayout();
 
     final protected Cursor defaultCursor = new Cursor(Cursor.CROSSHAIR_CURSOR);
 
@@ -49,12 +40,7 @@ public class CaseViewer extends JPanel {
         magnifierWindow = new MagnifierWindow(this);
         magnifierWindow.setSize(MAGNIFIER_SIZE, MAGNIFIER_SIZE);
 
-        setMinimumSize(new Dimension(800, 600));
-        setPreferredSize(new Dimension(800, 600));
-
-        setLayout(new BorderLayout());
-
-        add(hBox);
+        setLayout(layout);
 
         addMouseListener(new MouseAdapter() {
             @Override
@@ -83,36 +69,6 @@ public class CaseViewer extends JPanel {
                 }
             }
         });
-
-        addComponentListener(new ComponentAdapter() {
-            @Override
-            public void componentResized(ComponentEvent e) {
-                updateScale();
-            }
-        });
-    }
-
-    protected void updateScale() {
-        int width = 0;
-        int height = 0;
-
-        for (OneView view : views) {
-            BufferedImage img = view.getImage();
-            width += img.getWidth();
-            height = Math.max(img.getHeight(), height);
-        }
-
-        Insets in = getInsets();
-
-        scale = Util.getScaleForResize(width, height, getWidth() - in.left
-                - in.right - (SPACING * (views.length - 1)), getHeight()
-                - in.top - in.bottom);
-
-        for (OneView view : views) {
-            view.setScale(scale);
-        }
-
-        repaint();
     }
 
     public void setCase(Case c) {
@@ -123,18 +79,43 @@ public class CaseViewer extends JPanel {
         views[2] = new OneView(theCase.getRightML(), "RML");
         views[3] = new OneView(theCase.getLeftML(), "LML");
 
-        updateScale();
+        removeAll();
+        add(views[0]);
+        add(views[1]);
+        add(views[2]);
+        add(views[3]);
 
-        hBox.removeAll();
-        hBox.add(views[0]);
-        hBox.add(Box.createHorizontalStrut(SPACING));
-        hBox.add(views[1]);
-        hBox.add(Box.createHorizontalStrut(SPACING));
-        hBox.add(views[2]);
-        hBox.add(Box.createHorizontalStrut(SPACING));
-        hBox.add(views[3]);
+        // add layout constraints
+        layout.putConstraint(SpringLayout.WEST, views[0], 0, SpringLayout.WEST,
+                this);
+        layout.putConstraint(SpringLayout.WEST, views[1], SPACING,
+                SpringLayout.EAST, views[0]);
+        layout.putConstraint(SpringLayout.WEST, views[2], SPACING,
+                SpringLayout.EAST, views[1]);
+        layout.putConstraint(SpringLayout.WEST, views[3], SPACING,
+                SpringLayout.EAST, views[2]);
+        layout.putConstraint(SpringLayout.EAST, this, 0, SpringLayout.EAST,
+                views[3]);
 
-        hBox.revalidate();
+        layout.putConstraint(SpringLayout.NORTH, views[0], 0,
+                SpringLayout.NORTH, this);
+        layout.putConstraint(SpringLayout.NORTH, views[1], 0,
+                SpringLayout.NORTH, this);
+        layout.putConstraint(SpringLayout.NORTH, views[2], 0,
+                SpringLayout.NORTH, this);
+        layout.putConstraint(SpringLayout.NORTH, views[3], 0,
+                SpringLayout.NORTH, this);
+
+        layout.putConstraint(SpringLayout.SOUTH, views[0], 0,
+                SpringLayout.SOUTH, this);
+        layout.putConstraint(SpringLayout.SOUTH, views[1], 0,
+                SpringLayout.SOUTH, this);
+        layout.putConstraint(SpringLayout.SOUTH, views[2], 0,
+                SpringLayout.SOUTH, this);
+        layout.putConstraint(SpringLayout.SOUTH, views[3], 0,
+                SpringLayout.SOUTH, this);
+
+        revalidate();
 
         magnifierWindow.repaint();
     }
@@ -149,9 +130,5 @@ public class CaseViewer extends JPanel {
 
     public OneView[] getViews() {
         return views;
-    }
-
-    public double getScale() {
-        return scale;
     }
 }
