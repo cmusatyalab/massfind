@@ -73,6 +73,8 @@ public class Demo extends JFrame {
     }
 
     private void setupWindow() {
+        add(new Banner(), BorderLayout.NORTH);
+        
         add(caseViewer);
 
         Box h = Box.createHorizontalBox();
