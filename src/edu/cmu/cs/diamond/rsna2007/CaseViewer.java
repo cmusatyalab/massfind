@@ -2,6 +2,7 @@ package edu.cmu.cs.diamond.rsna2007;
 
 import java.awt.Cursor;
 import java.awt.Point;
+import java.awt.Toolkit;
 import java.awt.event.MouseAdapter;
 import java.awt.event.MouseEvent;
 import java.awt.event.MouseMotionAdapter;
@@ -20,9 +21,10 @@ public class CaseViewer extends JPanel {
 
     final private OneView views[] = new OneView[4];
 
-    final Cursor hiddenCursor = getToolkit().createCustomCursor(
-            new BufferedImage(1, 1, BufferedImage.TYPE_INT_ARGB), new Point(),
-            "Hidden Cursor");
+    static final Cursor hiddenCursor = Toolkit.getDefaultToolkit()
+            .createCustomCursor(
+                    new BufferedImage(1, 1, BufferedImage.TYPE_INT_ARGB),
+                    new Point(), "Hidden Cursor");
 
     final protected MagnifierWindow magnifierWindow;
 

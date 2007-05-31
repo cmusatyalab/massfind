@@ -80,6 +80,7 @@ public class MagnifierWindow extends JWindow {
         super();
         setBackground(Color.BLACK);
         getContentPane().setBackground(null);
+        setCursor(CaseViewer.hiddenCursor);
         this.viewer = viewer;
 
         add(new Magnifier());
