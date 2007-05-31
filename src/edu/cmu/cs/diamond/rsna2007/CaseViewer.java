@@ -21,8 +21,8 @@ public class CaseViewer extends JPanel {
     final private OneView views[] = new OneView[4];
 
     final Cursor hiddenCursor = getToolkit().createCustomCursor(
-            new BufferedImage(1, 1, BufferedImage.TYPE_INT_ARGB),
-            new Point(), "Hidden Cursor");
+            new BufferedImage(1, 1, BufferedImage.TYPE_INT_ARGB), new Point(),
+            "Hidden Cursor");
 
     final protected MagnifierWindow magnifierWindow;
 
@@ -34,7 +34,7 @@ public class CaseViewer extends JPanel {
         super();
 
         setBackground(null);
-
+        
         setCursor(defaultCursor);
 
         magnifierWindow = new MagnifierWindow(this);
@@ -74,10 +74,14 @@ public class CaseViewer extends JPanel {
     public void setCase(Case c) {
         theCase = c;
 
-        views[0] = new OneView(theCase.getRightCC(), "RCC");
-        views[1] = new OneView(theCase.getLeftCC(), "LCC");
-        views[2] = new OneView(theCase.getRightML(), "RML");
-        views[3] = new OneView(theCase.getLeftML(), "LML");
+        views[0] = new OneView(theCase.getRightCC(), "RCC", theCase
+                .getMaximumHeight());
+        views[1] = new OneView(theCase.getLeftCC(), "LCC", theCase
+                .getMaximumHeight());
+        views[2] = new OneView(theCase.getRightML(), "RML", theCase
+                .getMaximumHeight());
+        views[3] = new OneView(theCase.getLeftML(), "LML", theCase
+                .getMaximumHeight());
 
         removeAll();
         add(views[0]);
@@ -97,23 +101,12 @@ public class CaseViewer extends JPanel {
         layout.putConstraint(SpringLayout.EAST, this, 0, SpringLayout.EAST,
                 views[3]);
 
-        layout.putConstraint(SpringLayout.NORTH, views[0], 0,
-                SpringLayout.NORTH, this);
-        layout.putConstraint(SpringLayout.NORTH, views[1], 0,
-                SpringLayout.NORTH, this);
-        layout.putConstraint(SpringLayout.NORTH, views[2], 0,
-                SpringLayout.NORTH, this);
-        layout.putConstraint(SpringLayout.NORTH, views[3], 0,
-                SpringLayout.NORTH, this);
-
-        layout.putConstraint(SpringLayout.SOUTH, views[0], 0,
-                SpringLayout.SOUTH, this);
-        layout.putConstraint(SpringLayout.SOUTH, views[1], 0,
-                SpringLayout.SOUTH, this);
-        layout.putConstraint(SpringLayout.SOUTH, views[2], 0,
-                SpringLayout.SOUTH, this);
-        layout.putConstraint(SpringLayout.SOUTH, views[3], 0,
-                SpringLayout.SOUTH, this);
+        for (OneView v : views) {
+            layout.putConstraint(SpringLayout.NORTH, v, 0, SpringLayout.NORTH,
+                    this);
+            layout.putConstraint(SpringLayout.SOUTH, v, 0, SpringLayout.SOUTH,
+                    this);
+        }
 
         revalidate();
 

@@ -1,5 +1,6 @@
 package edu.cmu.cs.diamond.rsna2007;
 
+import java.awt.Color;
 import java.awt.Dimension;
 import java.awt.Graphics;
 import java.awt.Insets;
@@ -20,6 +21,8 @@ public class OneView extends JPanel {
     private int drawPosX;
 
     private double scale;
+    
+    final private int unscaledHeight;
 
     private int oldW;
 
@@ -27,17 +30,20 @@ public class OneView extends JPanel {
 
     final private String viewName;
 
-    public OneView(BufferedImage img, String viewName) {
+    public OneView(BufferedImage img, String viewName, int unscaledHeight) {
         super();
 
-        setBackground(null);
-        
+        // setBackground(null);
+        setBackground(Color.CYAN);
+
         this.img = img;
 
         this.viewName = viewName;
+        
+        this.unscaledHeight = unscaledHeight;
 
         int w = img.getWidth();
-        int h = img.getHeight();
+        int h = unscaledHeight;
         setPreferredSize(new Dimension(w, h));
         setMinimumSize(new Dimension(w / 2, h / 2));
         setMaximumSize(new Dimension(w * 2, h * 2));
@@ -46,7 +52,7 @@ public class OneView extends JPanel {
     @Override
     protected void paintComponent(Graphics g) {
         super.paintComponent(g);
-        
+
         if (oldW != getWidth() || oldH != getHeight()) {
             // System.out.println("drawing scaled image");
             drawScaledImg();
@@ -62,7 +68,7 @@ public class OneView extends JPanel {
         final int cH = getHeight() - in.top - in.bottom;
 
         final int w = img.getWidth();
-        final int h = img.getHeight();
+        final int h = unscaledHeight;
 
         scale = Util.getScaleForResize(w, h, cW, cH);
 
