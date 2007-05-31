@@ -34,7 +34,7 @@ public class CaseViewer extends JPanel {
         super();
 
         setBackground(null);
-        
+
         setCursor(defaultCursor);
 
         magnifierWindow = new MagnifierWindow(this);
@@ -90,7 +90,7 @@ public class CaseViewer extends JPanel {
         add(views[3]);
 
         // add layout constraints
-        layout.putConstraint(SpringLayout.WEST, views[0], 0, SpringLayout.WEST,
+        layout.putConstraint(SpringLayout.WEST, views[0], 1, SpringLayout.WEST,
                 this);
         layout.putConstraint(SpringLayout.WEST, views[1], SPACING,
                 SpringLayout.EAST, views[0]);
@@ -98,17 +98,18 @@ public class CaseViewer extends JPanel {
                 SpringLayout.EAST, views[1]);
         layout.putConstraint(SpringLayout.WEST, views[3], SPACING,
                 SpringLayout.EAST, views[2]);
-        layout.putConstraint(SpringLayout.EAST, this, 0, SpringLayout.EAST,
+        layout.putConstraint(SpringLayout.EAST, this, 1, SpringLayout.EAST,
                 views[3]);
 
         for (OneView v : views) {
-            layout.putConstraint(SpringLayout.NORTH, v, 0, SpringLayout.NORTH,
+            layout.putConstraint(SpringLayout.NORTH, v, 1, SpringLayout.NORTH,
                     this);
-            layout.putConstraint(SpringLayout.SOUTH, v, 0, SpringLayout.SOUTH,
+            layout.putConstraint(SpringLayout.SOUTH, v, 1, SpringLayout.SOUTH,
                     this);
         }
 
         revalidate();
+        repaint();
 
         magnifierWindow.repaint();
     }

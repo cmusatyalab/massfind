@@ -1,6 +1,5 @@
 package edu.cmu.cs.diamond.rsna2007;
 
-import java.awt.Color;
 import java.awt.Dimension;
 import java.awt.Graphics;
 import java.awt.Insets;
@@ -21,7 +20,7 @@ public class OneView extends JPanel {
     private int drawPosX;
 
     private double scale;
-    
+
     final private int unscaledHeight;
 
     private int oldW;
@@ -33,13 +32,12 @@ public class OneView extends JPanel {
     public OneView(BufferedImage img, String viewName, int unscaledHeight) {
         super();
 
-        // setBackground(null);
-        setBackground(Color.CYAN);
+        setBackground(null);
 
         this.img = img;
 
         this.viewName = viewName;
-        
+
         this.unscaledHeight = unscaledHeight;
 
         int w = img.getWidth();
@@ -73,7 +71,7 @@ public class OneView extends JPanel {
         scale = Util.getScaleForResize(w, h, cW, cH);
 
         final int sW = (int) (w * scale);
-        final int sH = (int) (h * scale);
+        final int sH = (int) (img.getHeight() * scale);
 
         scaledImg = getGraphicsConfiguration().createCompatibleImage(sW, sH);
 
