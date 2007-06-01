@@ -58,6 +58,9 @@ public class OneView extends JPanel {
         }
 
         g.drawImage(scaledImg, drawPosX, drawPosY, null);
+        // g.setColor(Color.WHITE);
+        // g.drawString(Double.toString(scale),
+        // g.getFontMetrics().getMaxAscent() + 10, 20);
     }
 
     private void drawScaledImg() {
@@ -93,5 +96,9 @@ public class OneView extends JPanel {
 
     public String getViewName() {
         return viewName;
+    }
+
+    public double getScale() {
+        return scale;
     }
 }

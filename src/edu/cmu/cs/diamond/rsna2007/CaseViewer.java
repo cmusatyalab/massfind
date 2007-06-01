@@ -92,6 +92,8 @@ public class CaseViewer extends JPanel {
         add(views[3]);
 
         // add layout constraints
+
+        // left-to-right
         layout.putConstraint(SpringLayout.WEST, views[0], 1, SpringLayout.WEST,
                 this);
         layout.putConstraint(SpringLayout.WEST, views[1], SPACING,
@@ -103,10 +105,24 @@ public class CaseViewer extends JPanel {
         layout.putConstraint(SpringLayout.EAST, this, 1, SpringLayout.EAST,
                 views[3]);
 
+        // connect bottom
+        layout.putConstraint(SpringLayout.SOUTH, views[1], 0,
+                SpringLayout.SOUTH, views[0]);
+        layout.putConstraint(SpringLayout.SOUTH, views[2], 0,
+                SpringLayout.SOUTH, views[1]);
+        layout.putConstraint(SpringLayout.SOUTH, views[3], 0,
+                SpringLayout.SOUTH, views[2]);
+        layout.putConstraint(SpringLayout.SOUTH, this, 1, SpringLayout.SOUTH,
+                views[3]);
+
+        // must set NORTH edges last in Java 5, so that the HEIGHT is
+        // unconstrained instead of y
+        // compare SpringLayout.Constraints in Java 5 to Java 6, where
+        // this ordering is not as strange
+        
+        // connect top
         for (OneView v : views) {
             layout.putConstraint(SpringLayout.NORTH, v, 1, SpringLayout.NORTH,
-                    this);
-            layout.putConstraint(SpringLayout.SOUTH, v, 1, SpringLayout.SOUTH,
                     this);
         }
 
@@ -127,4 +143,16 @@ public class CaseViewer extends JPanel {
     public OneView[] getViews() {
         return views;
     }
+
+    // @Override
+    // protected void paintComponent(Graphics g) {
+    // super.paintComponent(g);
+    // for (int i = 0; i < views.length; i++) {
+    // for (int j = 1; j < views.length; j++) {
+    // System.out.println(i + "-" + j + ": "
+    // + (views[i].getScale() - views[j].getScale()));
+    // }
+    // }
+    // System.out.println();
+    // }
 }
