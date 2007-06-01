@@ -51,9 +51,13 @@ public class OneView extends JPanel {
     protected void paintComponent(Graphics g) {
         super.paintComponent(g);
 
-        if (oldW != getWidth() || oldH != getHeight()) {
+        int w = getWidth();
+        int h = getHeight();
+        if (oldW != w || oldH != h) {
             // System.out.println("drawing scaled image");
             drawScaledImg();
+            oldW = w;
+            oldH = h;
             // System.out.println("done");
         }
 
