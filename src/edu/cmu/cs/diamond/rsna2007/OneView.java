@@ -54,11 +54,9 @@ public class OneView extends JPanel {
         int w = getWidth();
         int h = getHeight();
         if (oldW != w || oldH != h) {
-            // System.out.println("drawing scaled image");
             drawScaledImg();
             oldW = w;
             oldH = h;
-            // System.out.println("done");
         }
 
         g.drawImage(scaledImg, drawPosX, drawPosY, null);
@@ -78,11 +76,8 @@ public class OneView extends JPanel {
         scale = Util.getScaleForResize(w, h, cW, cH);
 
         final int sW = (int) (w * scale);
-        final int sH = (int) (img.getHeight() * scale);
 
-        scaledImg = getGraphicsConfiguration().createCompatibleImage(sW, sH);
-
-        Util.scaleImage(img, scaledImg, false);
+        scaledImg = Util.scaleImageFast(img, scale);
 
         // center in X
         drawPosX = (cW - sW) / 2 + in.left;
