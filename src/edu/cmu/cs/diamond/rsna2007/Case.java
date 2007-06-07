@@ -1,6 +1,8 @@
 package edu.cmu.cs.diamond.rsna2007;
 
 import java.awt.image.BufferedImage;
+import java.util.ArrayList;
+import java.util.List;
 
 public class Case {
     final private BufferedImage rightCC;
@@ -10,6 +12,8 @@ public class Case {
     final private BufferedImage rightML;
 
     final private BufferedImage leftML;
+    
+    final private List<ROI> rois = new ArrayList<ROI>();
 
     final private String name;
 
@@ -46,5 +50,11 @@ public class Case {
     public int getMaximumHeight() {
         return Math.max(rightCC.getHeight(), Math.max(leftCC.getHeight(), Math
                 .max(rightML.getHeight(), leftML.getHeight())));
+    }
+    
+    // right now we support a pre-computed list
+    // but we want to change this to be generated on the fly
+    public ROI[] getROIs() {
+        return rois.toArray(new ROI[0]);
     }
 }
