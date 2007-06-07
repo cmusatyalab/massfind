@@ -192,7 +192,9 @@ public class Demo extends JFrame {
 
                 });
                 if (f.length > 0) {
-                    roi = new ROI(new FileInputStream(f[0]));
+                    String s = f[0].getAbsolutePath();
+                    File roiPix = new File(s.substring(0, s.lastIndexOf(".")));
+                    roi = new ROI(new FileInputStream(f[0]), ImageIO.read(roiPix));
                 }
 
                 Truth t = null;

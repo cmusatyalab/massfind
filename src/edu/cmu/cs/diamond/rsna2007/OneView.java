@@ -44,6 +44,17 @@ public class OneView extends JPanel {
         setPreferredSize(new Dimension(w, h));
         setMinimumSize(new Dimension(w / 2, h / 2));
         setMaximumSize(new Dimension(w * 2, h * 2));
+
+        Truth t = casePiece.getTruth();
+        if (t != null && t.getBiopsy() == Truth.Biopsy.BIOPSY_MALIGNANT) {
+            setToolTipText("<html><table><tr><th>Age</th><td>" + t.getAge()
+                    + "</tr><tr><th>Shape</th><td>" + t.getShape()
+                    + "</td></tr><tr><th>Margin</th><td>" + t.getMargin()
+                    + "</td></tr><tr><th>BIRAD</th><td>" + t.getBirad()
+                    + "</td></tr><tr><th>Density</th><td>" + t.getDensity()
+                    + "</td></tr><tr><th>Subtlety</th><td>" + t.getSubtlety()
+                    + "</td></tr></table></html>");
+        }
     }
 
     @Override
@@ -76,6 +87,17 @@ public class OneView extends JPanel {
                     g2.fill(new Rectangle2D.Double(p.getX() * scale, p.getY()
                             * scale, 1, 1));
                 }
+
+                Point2D c = r.getCenter();
+
+                BufferedImage roi = r.getImage();
+                double rw = roi.getWidth();
+                double rh = roi.getHeight();
+                double x = c.getX() - rw / 2;
+                double y = c.getY() - rh / 2;
+
+                g2.draw(new Rectangle2D.Double(scale * x, scale * y,
+                        scale * rh, scale * rh));
             }
         }
     }

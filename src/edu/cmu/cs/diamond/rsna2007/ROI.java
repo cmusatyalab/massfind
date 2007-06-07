@@ -1,6 +1,7 @@
 package edu.cmu.cs.diamond.rsna2007;
 
 import java.awt.geom.Point2D;
+import java.awt.image.BufferedImage;
 import java.io.BufferedReader;
 import java.io.IOException;
 import java.io.InputStream;
@@ -162,8 +163,10 @@ public class ROI {
     final private List<Point2D> contour;
 
     final private double data[] = new double[50];
+    
+    final private BufferedImage img;
 
-    public ROI(InputStream in) throws IOException {
+    public ROI(InputStream in, BufferedImage img) throws IOException {
         BufferedReader r = new BufferedReader(new InputStreamReader(in));
 
         String line;
@@ -190,9 +193,11 @@ public class ROI {
         }
 
         contour = makeContour(contourX, contourY);
+        this.img = img;
     }
 
-    private static List<Point2D> makeContour(double[] contourX, double[] contourY) {
+    private static List<Point2D> makeContour(double[] contourX,
+            double[] contourY) {
         List<Point2D> p = new ArrayList<Point2D>();
 
         for (int i = 0; i < contourY.length; i++) {
@@ -201,7 +206,7 @@ public class ROI {
 
             p.add(new Point2D.Double(x, y));
         }
-        
+
         return p;
     }
 
@@ -218,6 +223,11 @@ public class ROI {
 
     public List<Point2D> getContour() {
         return contour;
+    }
+
+    public Point2D getCenter() {
+        return new Point2D.Double(data[UPMC_CENTER_X] * 4,
+                data[UPMC_CENTER_Y] * 4);
     }
 
     public double getData(int index) {
@@ -237,5 +247,9 @@ public class ROI {
         sb.append(" " + contour);
 
         return sb.toString();
+    }
+    
+    public BufferedImage getImage() {
+        return img;
     }
 }
