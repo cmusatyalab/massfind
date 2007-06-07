@@ -1,6 +1,5 @@
 package edu.cmu.cs.diamond.rsna2007;
 
-
 public class Truth {
     public enum MassMargin {
         MASS_MARGIN_SPICULATED, MASS_MARGIN_ILLDEFINED, MASS_MARGIN_MICROLOBULATED, MASS_MARGIN_CIRCUMSCRIBED, MASS_MARGIN_OBSCURED
@@ -29,9 +28,9 @@ public class Truth {
     final private MassMargin margin;
 
     final private ROI roi;
-    
-    public Truth(int birad, int density, int age, int subtlety, Biopsy biopsy,
-            MassShape shape, MassMargin margin, ROI roi) {
+
+    public Truth(int birad, int subtlety, int density, int age,
+            Biopsy biopsy, MassShape shape, MassMargin margin, ROI roi) {
         this.birad = birad;
         this.subtlety = subtlety;
         this.density = density;
@@ -69,7 +68,7 @@ public class Truth {
     public int getSubtlety() {
         return subtlety;
     }
-    
+
     public ROI getROI() {
         return roi;
     }
