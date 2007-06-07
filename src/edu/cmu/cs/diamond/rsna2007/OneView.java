@@ -1,6 +1,8 @@
 package edu.cmu.cs.diamond.rsna2007;
 
 import java.awt.*;
+import java.awt.geom.Point2D;
+import java.awt.geom.Rectangle2D;
 import java.awt.image.BufferedImage;
 
 import javax.swing.JPanel;
@@ -66,11 +68,14 @@ public class OneView extends JPanel {
             ROI r = t.getROI();
             if (r != null) {
                 Graphics2D g2 = (Graphics2D) g;
-                g2.setColor(Color.WHITE);
-                
-                Shape s = r.getContour();
-                System.out.println(s);
-                g2.draw(s);
+                g2.setColor(Color.RED);
+
+                g2.translate(drawPosX, drawPosY);
+
+                for (Point2D p : r.getContour()) {
+                    g2.fill(new Rectangle2D.Double(p.getX() * scale, p.getY()
+                            * scale, 1, 1));
+                }
             }
         }
     }

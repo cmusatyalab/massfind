@@ -45,8 +45,8 @@ public class Demo extends JFrame {
             m = new Demo(new File(args[0]));
             m.setDefaultCloseOperation(JFrame.EXIT_ON_CLOSE);
 
-//            m.setUndecorated(true);
-//            m.setResizable(false);
+            m.setUndecorated(true);
+            m.setResizable(false);
 
             DisplayMode dm = gd.getDisplayMode();
             m.setBounds(0, 0, dm.getWidth(), dm.getHeight());
@@ -176,16 +176,16 @@ public class Demo extends JFrame {
                 String ti[] = truth.get(exactName);
 
                 ROI roi = null;
-
                 // try to load ROI file
                 File f[] = dir.listFiles(new FileFilter() {
 
                     public boolean accept(File pathname) {
                         String name = pathname.getName();
 
-                        boolean result = name.endsWith(exactName + ".jpg.text_attr");
+                        boolean result = name.contains(exactName)
+                                && name.endsWith(".text_attr");
                         if (result) {
-                            System.out.println("matched " + name);
+                            System.out.println(" *** matched " + name);
                         }
                         return result;
                     }
@@ -212,7 +212,7 @@ public class Demo extends JFrame {
 
                     t = new Truth(birad, subtlety, density, age, biopsy, shape,
                             margin, roi);
-                    System.out.println(t);
+                    // System.out.println(t);
                 }
 
                 BufferedImage img = ImageIO.read(new File(dir, line));

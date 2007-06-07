@@ -1,11 +1,12 @@
 package edu.cmu.cs.diamond.rsna2007;
 
-import java.awt.Shape;
-import java.awt.geom.GeneralPath;
+import java.awt.geom.Point2D;
 import java.io.BufferedReader;
 import java.io.IOException;
 import java.io.InputStream;
 import java.io.InputStreamReader;
+import java.util.ArrayList;
+import java.util.List;
 import java.util.regex.Matcher;
 import java.util.regex.Pattern;
 
@@ -158,7 +159,7 @@ public class ROI {
     // 48 empty
     // 49 empty
 
-    final private Shape contour;
+    final private List<Point2D> contour;
 
     final private double data[] = new double[50];
 
@@ -191,17 +192,16 @@ public class ROI {
         contour = makeContour(contourX, contourY);
     }
 
-    // TODO convex hull
-    private static Shape makeContour(double[] contourX, double[] contourY) {
-        GeneralPath p = new GeneralPath();
-        for (int i = 0; i < contourX.length; i++) {
-            if (i == 0) {
-                p.moveTo((float) contourX[i], (float) contourY[i]);
-            } else {
-                p.lineTo((float) contourX[i], (float) contourY[i]);
-            }
-            p.closePath();
+    private static List<Point2D> makeContour(double[] contourX, double[] contourY) {
+        List<Point2D> p = new ArrayList<Point2D>();
+
+        for (int i = 0; i < contourY.length; i++) {
+            double x = contourX[i];
+            double y = contourY[i];
+
+            p.add(new Point2D.Double(x, y));
         }
+        
         return p;
     }
 
@@ -216,26 +216,26 @@ public class ROI {
         return result;
     }
 
-    public Shape getContour() {
+    public List<Point2D> getContour() {
         return contour;
     }
 
     public double getData(int index) {
         return data[index];
     }
-    
+
     @Override
     public String toString() {
         StringBuilder sb = new StringBuilder();
-        
+
         sb.append("[");
         for (int i = 0; i < data.length; i++) {
             sb.append(" " + i + ":" + data[i]);
         }
         sb.append(" ]");
-        
+
         sb.append(" " + contour);
-        
+
         return sb.toString();
     }
 }
