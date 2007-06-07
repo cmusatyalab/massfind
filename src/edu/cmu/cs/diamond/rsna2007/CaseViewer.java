@@ -1,5 +1,6 @@
 package edu.cmu.cs.diamond.rsna2007;
 
+import java.awt.Component;
 import java.awt.Cursor;
 import java.awt.Point;
 import java.awt.Toolkit;
@@ -61,6 +62,29 @@ public class CaseViewer extends JPanel {
                     magnifierWindow.setVisible(false);
                 }
             }
+
+            // preliminary search support
+            @Override
+            public void mouseClicked(MouseEvent e) {
+                if (e.getButton() == 1 && e.getClickCount() == 2) {
+                    Component c = SwingUtilities.getDeepestComponentAt(
+                            CaseViewer.this, e.getX(), e.getY());
+
+                    if (c instanceof OneView) {
+                        OneView ov = (OneView) c;
+                        Truth t = ov.getTruth();
+                        if (t != null) {
+                            ROI r = t.getROI();
+
+                            if (r != null) {
+                                // start a search
+                                startSearch(ov, r);
+                                return;
+                            }
+                        }
+                    }
+                }
+            }
         });
 
         addMouseMotionListener(new MouseMotionAdapter() {
@@ -119,7 +143,7 @@ public class CaseViewer extends JPanel {
         // unconstrained instead of y
         // compare SpringLayout.Constraints in Java 5 to Java 6, where
         // this ordering is not as strange
-        
+
         // connect top
         for (OneView v : views) {
             layout.putConstraint(SpringLayout.NORTH, v, 1, SpringLayout.NORTH,
@@ -142,6 +166,21 @@ public class CaseViewer extends JPanel {
 
     public OneView[] getViews() {
         return views;
+    }
+
+    public void startSearch(OneView view, ROI r) {
+        // "upcall"
+        boolean searchPanelOnRight = (view == views[0] || view == views[1]);
+
+        SearchPanel sp = new SearchPanel(r);
+
+        if (searchPanelOnRight) {
+            views[2].setVisible(false);
+            views[3].setVisible(false);
+        } else {
+            views[0].setVisible(false);
+            views[1].setVisible(false);
+        }
     }
 
     // @Override

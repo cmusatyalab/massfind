@@ -125,6 +125,10 @@ public class OneView extends JPanel {
         return casePiece.getImage();
     }
 
+    public Truth getTruth() {
+        return casePiece.getTruth();
+    }
+    
     public Point getImagePoint(Point p) {
         return new Point((int) ((p.x - drawPosX) / scale),
                 (int) ((p.y - drawPosY) / scale));
