@@ -10,7 +10,9 @@ import java.io.FileNotFoundException;
 import java.io.FileReader;
 import java.io.IOException;
 import java.util.ArrayList;
+import java.util.HashMap;
 import java.util.List;
+import java.util.Map;
 import java.util.regex.Matcher;
 import java.util.regex.Pattern;
 
@@ -57,14 +59,14 @@ public class Demo extends JFrame {
 
     public Demo(File file) throws IOException {
         super("Diamond RSNA 2007");
-        
+
         setMinimumSize(new Dimension(640, 480));
 
         setBackground(Color.BLACK);
-        
+
         Container cp = getContentPane();
         cp.setBackground(null);
-                
+
         readIndex(file);
 
         setupWindow();
@@ -74,7 +76,7 @@ public class Demo extends JFrame {
 
     private void setupWindow() {
         add(new Banner(), BorderLayout.NORTH);
-        
+
         add(caseViewer);
 
         Box h = Box.createHorizontalBox();
@@ -96,7 +98,7 @@ public class Demo extends JFrame {
         });
 
         caseLabel.setForeground(Color.WHITE);
-        
+
         h.add(Box.createHorizontalGlue());
         h.add(prevButton);
         h.add(Box.createHorizontalGlue());
@@ -120,12 +122,37 @@ public class Demo extends JFrame {
     }
 
     private void readIndex(File file) throws FileNotFoundException, IOException {
-        BufferedReader reader = new BufferedReader(new FileReader(file));
-
         File dir = file.getParentFile();
         String line;
 
+        System.out.println("Reading truthfile");
+        File truthfile = new File(dir, "Truthfile.txt");
+        BufferedReader truthReader = new BufferedReader(new FileReader(truthfile));
+        Map<String, String[]> truth = new HashMap<String, String[]>();
+        
+        Pattern tp = Pattern.compile("(\\S+\\.img\\s+.*)");
+        while ((line = truthReader.readLine()) != null) {
+            Matcher m = tp.matcher(line);
+            if (m.find()) {
+                // split
+                String splitLine[] = m.group(1).split("\\s+");
+                String key = splitLine[0].substring(0, splitLine[0].lastIndexOf(".img"));
+                String value[] = new String[splitLine.length - 1];
+                System.arraycopy(splitLine, 1, value, 0, value.length);
+                truth.put(key, value);
+            }
+        }
+        for (String key : truth.keySet()) {
+            System.out.print(key + " -> [");
+            for (String val : truth.get(key)) {
+                System.out.print(val + " ");
+            }
+            System.out.println("]");
+        }
+        
+        System.out.println();
         System.out.println("Reading index file: " + file);
+        BufferedReader reader = new BufferedReader(new FileReader(file));
 
         BufferedImage rml = null, lml = null, rcc = null, lcc = null;
         String name = null;
