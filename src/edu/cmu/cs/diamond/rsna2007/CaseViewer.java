@@ -4,9 +4,7 @@ import java.awt.Component;
 import java.awt.Cursor;
 import java.awt.Point;
 import java.awt.Toolkit;
-import java.awt.event.MouseAdapter;
-import java.awt.event.MouseEvent;
-import java.awt.event.MouseMotionAdapter;
+import java.awt.event.*;
 import java.awt.image.BufferedImage;
 
 import javax.swing.JLayeredPane;
@@ -33,6 +31,61 @@ public class CaseViewer extends JLayeredPane {
 
     final protected Cursor defaultCursor = new Cursor(Cursor.CROSSHAIR_CURSOR);
 
+    final private SearchPanel leftSearchResults = new SearchPanel();
+
+    final private SearchPanel rightSearchResults = new SearchPanel();
+
+    final private MouseListener mouseListener = new MouseAdapter() {
+        @Override
+        public void mousePressed(MouseEvent e) {
+            if (e.getButton() == 2) {
+                updateMagnifierPosition(e);
+                setCursor(hiddenCursor);
+                magnifierWindow.setVisible(true);
+            }
+        }
+
+        @Override
+        public void mouseReleased(MouseEvent e) {
+            if (e.getButton() == 2) {
+                setCursor(defaultCursor);
+                magnifierWindow.setVisible(false);
+            }
+        }
+
+        // preliminary search support
+        @Override
+        public void mouseClicked(MouseEvent e) {
+            if (e.getButton() == 1 && e.getClickCount() == 2) {
+                Component c = e.getComponent();
+                System.out.println(c);
+
+                if (c instanceof OneView) {
+                    OneView ov = (OneView) c;
+                    Truth t = ov.getTruth();
+                    if (t != null) {
+                        ROI r = t.getROI();
+
+                        if (r != null) {
+                            // start a search
+                            startSearch(ov, r);
+                            return;
+                        }
+                    }
+                }
+            }
+        }
+    };
+
+    final private MouseMotionListener mouseMotionListener = new MouseMotionAdapter() {
+        @Override
+        public void mouseDragged(MouseEvent e) {
+            if (magnifierWindow.isVisible()) {
+                updateMagnifierPosition(e);
+            }
+        }
+    };
+
     public CaseViewer() {
         super();
 
@@ -45,56 +98,9 @@ public class CaseViewer extends JLayeredPane {
 
         setLayout(layout);
 
-        addMouseListener(new MouseAdapter() {
-            @Override
-            public void mousePressed(MouseEvent e) {
-                if (e.getButton() == 2) {
-                    updateMagnifierPosition(e);
-                    setCursor(hiddenCursor);
-                    magnifierWindow.setVisible(true);
-                }
-            }
+        addMouseListener(mouseListener);
 
-            @Override
-            public void mouseReleased(MouseEvent e) {
-                if (e.getButton() == 2) {
-                    setCursor(defaultCursor);
-                    magnifierWindow.setVisible(false);
-                }
-            }
-
-            // preliminary search support
-            @Override
-            public void mouseClicked(MouseEvent e) {
-                if (e.getButton() == 1 && e.getClickCount() == 2) {
-                    Component c = SwingUtilities.getDeepestComponentAt(
-                            CaseViewer.this, e.getX(), e.getY());
-
-                    if (c instanceof OneView) {
-                        OneView ov = (OneView) c;
-                        Truth t = ov.getTruth();
-                        if (t != null) {
-                            ROI r = t.getROI();
-
-                            if (r != null) {
-                                // start a search
-                                startSearch(ov, r);
-                                return;
-                            }
-                        }
-                    }
-                }
-            }
-        });
-
-        addMouseMotionListener(new MouseMotionAdapter() {
-            @Override
-            public void mouseDragged(MouseEvent e) {
-                if (magnifierWindow.isVisible()) {
-                    updateMagnifierPosition(e);
-                }
-            }
-        });
+        addMouseMotionListener(mouseMotionListener);
     }
 
     public void setCase(Case c) {
@@ -110,10 +116,17 @@ public class CaseViewer extends JLayeredPane {
                 .getMaximumHeight());
 
         removeAll();
-        add(views[0]);
-        add(views[1]);
-        add(views[2]);
-        add(views[3]);
+        add(leftSearchResults, new Integer(10));
+        add(rightSearchResults, new Integer(10));
+
+        leftSearchResults.setVisible(false);
+        rightSearchResults.setVisible(false);
+
+        for (OneView o : views) {
+            add(o, JLayeredPane.DEFAULT_LAYER);
+            o.addMouseListener(mouseListener);
+            o.addMouseMotionListener(mouseMotionListener);
+        }
 
         // add layout constraints
 
@@ -150,6 +163,25 @@ public class CaseViewer extends JLayeredPane {
                     this);
         }
 
+        // connect up the search things
+        layout.putConstraint(SpringLayout.EAST, leftSearchResults, 0,
+                SpringLayout.EAST, views[1]);
+        layout.putConstraint(SpringLayout.WEST, leftSearchResults, 0,
+                SpringLayout.WEST, views[0]);
+        layout.putConstraint(SpringLayout.SOUTH, leftSearchResults, 0,
+                SpringLayout.SOUTH, views[0]);
+        layout.putConstraint(SpringLayout.NORTH, leftSearchResults, 0,
+                SpringLayout.NORTH, views[0]);
+
+        layout.putConstraint(SpringLayout.EAST, rightSearchResults, 0,
+                SpringLayout.EAST, views[3]);
+        layout.putConstraint(SpringLayout.WEST, rightSearchResults, 0,
+                SpringLayout.WEST, views[2]);
+        layout.putConstraint(SpringLayout.SOUTH, rightSearchResults, 0,
+                SpringLayout.SOUTH, views[0]);
+        layout.putConstraint(SpringLayout.NORTH, rightSearchResults, 0,
+                SpringLayout.NORTH, views[0]);
+
         revalidate();
         repaint();
 
@@ -169,17 +201,13 @@ public class CaseViewer extends JLayeredPane {
     }
 
     public void startSearch(OneView view, ROI r) {
-        // "upcall"
+        System.out.println("start search");
         boolean searchPanelOnRight = (view == views[0] || view == views[1]);
 
-        SearchPanel sp = new SearchPanel(r);
-
         if (searchPanelOnRight) {
-            views[2].setVisible(false);
-            views[3].setVisible(false);
+            rightSearchResults.setVisible(true);
         } else {
-            views[0].setVisible(false);
-            views[1].setVisible(false);
+            leftSearchResults.setVisible(true);
         }
     }
 
