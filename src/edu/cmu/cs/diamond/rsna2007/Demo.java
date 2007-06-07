@@ -44,14 +44,16 @@ public class Demo extends JFrame {
         try {
             m = new Demo(new File(args[0]));
             m.setDefaultCloseOperation(JFrame.EXIT_ON_CLOSE);
-
-            m.setUndecorated(true);
-            m.setResizable(false);
-
             DisplayMode dm = gd.getDisplayMode();
+
+            if (true) {
+                m.setUndecorated(true);
+                m.setResizable(false);
+            }
+
             m.setBounds(0, 0, dm.getWidth(), dm.getHeight());
-            m.setVisible(true);
             m.toFront();
+            m.setVisible(true);
         } catch (IOException e) {
             e.printStackTrace();
         }
@@ -194,7 +196,8 @@ public class Demo extends JFrame {
                 if (f.length > 0) {
                     String s = f[0].getAbsolutePath();
                     File roiPix = new File(s.substring(0, s.lastIndexOf(".")));
-                    roi = new ROI(new FileInputStream(f[0]), ImageIO.read(roiPix));
+                    roi = new ROI(new FileInputStream(f[0]), ImageIO
+                            .read(roiPix));
                 }
 
                 Truth t = null;
