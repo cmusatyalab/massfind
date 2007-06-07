@@ -9,11 +9,11 @@ import java.awt.event.MouseEvent;
 import java.awt.event.MouseMotionAdapter;
 import java.awt.image.BufferedImage;
 
-import javax.swing.JPanel;
+import javax.swing.JLayeredPane;
 import javax.swing.SpringLayout;
 import javax.swing.SwingUtilities;
 
-public class CaseViewer extends JPanel {
+public class CaseViewer extends JLayeredPane {
     private final static int MAGNIFIER_SIZE = 512;
 
     private final static int SPACING = 10;
