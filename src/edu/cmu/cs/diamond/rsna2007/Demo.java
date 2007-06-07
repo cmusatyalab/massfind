@@ -4,11 +4,7 @@ import java.awt.*;
 import java.awt.event.ActionEvent;
 import java.awt.event.ActionListener;
 import java.awt.image.BufferedImage;
-import java.io.BufferedReader;
-import java.io.File;
-import java.io.FileNotFoundException;
-import java.io.FileReader;
-import java.io.IOException;
+import java.io.*;
 import java.util.ArrayList;
 import java.util.HashMap;
 import java.util.List;
@@ -21,6 +17,10 @@ import javax.swing.Box;
 import javax.swing.JButton;
 import javax.swing.JFrame;
 import javax.swing.JLabel;
+
+import edu.cmu.cs.diamond.rsna2007.Truth.Biopsy;
+import edu.cmu.cs.diamond.rsna2007.Truth.MassMargin;
+import edu.cmu.cs.diamond.rsna2007.Truth.MassShape;
 
 public class Demo extends JFrame {
     final private CaseViewer caseViewer = new CaseViewer();
@@ -45,8 +45,8 @@ public class Demo extends JFrame {
             m = new Demo(new File(args[0]));
             m.setDefaultCloseOperation(JFrame.EXIT_ON_CLOSE);
 
-            m.setUndecorated(true);
-            m.setResizable(false);
+//            m.setUndecorated(true);
+//            m.setResizable(false);
 
             DisplayMode dm = gd.getDisplayMode();
             m.setBounds(0, 0, dm.getWidth(), dm.getHeight());
@@ -127,34 +127,37 @@ public class Demo extends JFrame {
 
         System.out.println("Reading truthfile");
         File truthfile = new File(dir, "Truthfile.txt");
-        BufferedReader truthReader = new BufferedReader(new FileReader(truthfile));
+        BufferedReader truthReader = new BufferedReader(new FileReader(
+                truthfile));
         Map<String, String[]> truth = new HashMap<String, String[]>();
-        
+
         Pattern tp = Pattern.compile("(\\S+\\.img\\s+.*)");
         while ((line = truthReader.readLine()) != null) {
             Matcher m = tp.matcher(line);
             if (m.find()) {
                 // split
                 String splitLine[] = m.group(1).split("\\s+");
-                String key = splitLine[0].substring(0, splitLine[0].lastIndexOf(".img"));
+                String key = (splitLine[0].substring(0, splitLine[0]
+                        .lastIndexOf(".img")).intern());
                 String value[] = new String[splitLine.length - 1];
                 System.arraycopy(splitLine, 1, value, 0, value.length);
+                assert (!truth.containsKey(key));
                 truth.put(key, value);
             }
         }
         for (String key : truth.keySet()) {
             System.out.print(key + " -> [");
             for (String val : truth.get(key)) {
-                System.out.print(val + " ");
+                System.out.print(" " + val);
             }
-            System.out.println("]");
+            System.out.println(" ]");
         }
-        
+
         System.out.println();
         System.out.println("Reading index file: " + file);
         BufferedReader reader = new BufferedReader(new FileReader(file));
 
-        BufferedImage rml = null, lml = null, rcc = null, lcc = null;
+        CasePiece rml = null, lml = null, rcc = null, lcc = null;
         String name = null;
 
         Pattern p = Pattern.compile("(.*)(LCC|LML|RCC|RML)(.*)\\.jpg");
@@ -162,19 +165,68 @@ public class Demo extends JFrame {
         while ((line = reader.readLine()) != null) {
             Matcher m = p.matcher(line);
             if (m.matches()) {
+                final String exactName = (m.group(1) + m.group(2) + m.group(3))
+                        .intern();
+
                 if (name == null) {
                     name = m.group(1) + "xxx" + m.group(3);
                 }
 
+                // build truth
+                String ti[] = truth.get(exactName);
+
+                ROI roi = null;
+
+                // try to load ROI file
+                File f[] = dir.listFiles(new FileFilter() {
+
+                    public boolean accept(File pathname) {
+                        String name = pathname.getName();
+
+                        boolean result = name.endsWith(exactName + ".jpg.text_attr");
+                        if (result) {
+                            System.out.println("matched " + name);
+                        }
+                        return result;
+                    }
+
+                });
+                if (f.length > 0) {
+                    roi = new ROI(new FileInputStream(f[0]));
+                }
+
+                Truth t = null;
+                if (ti != null) {
+                    int birad = Integer.parseInt(ti[2]);
+                    int subtlety = Integer.parseInt(ti[3]);
+                    int density = Integer.parseInt(ti[4]);
+                    int age = -1;
+                    Truth.Biopsy biopsy = parseBiopsy(ti[6]);
+                    Truth.MassShape shape = null;
+                    Truth.MassMargin margin = null;
+                    if (biopsy == Biopsy.BIOPSY_MALIGNANT) {
+                        age = Integer.parseInt(ti[5]);
+                        shape = parseShape(ti[7]);
+                        margin = parseMargin(ti[8]);
+                    }
+
+                    t = new Truth(birad, subtlety, density, age, biopsy, shape,
+                            margin, roi);
+                    System.out.println(t);
+                }
+
+                BufferedImage img = ImageIO.read(new File(dir, line));
+                CasePiece cp = new CasePiece(img, t);
+
                 String view = m.group(2).intern();
                 if (view == "LCC") {
-                    lcc = ImageIO.read(new File(dir, line));
+                    lcc = cp;
                 } else if (view == "LML") {
-                    lml = ImageIO.read(new File(dir, line));
+                    lml = cp;
                 } else if (view == "RCC") {
-                    rcc = ImageIO.read(new File(dir, line));
+                    rcc = cp;
                 } else if (view == "RML") {
-                    rml = ImageIO.read(new File(dir, line));
+                    rml = cp;
                 }
             }
 
@@ -185,6 +237,46 @@ public class Demo extends JFrame {
                 name = null;
                 lcc = lml = rcc = rml = null;
             }
+        }
+    }
+
+    private MassMargin parseMargin(String s) {
+        if (s.equals("CIRCUMSCRIBED")) {
+            return MassMargin.MASS_MARGIN_CIRCUMSCRIBED;
+        } else if (s.equals("ILL_DEFINED")) {
+            return MassMargin.MASS_MARGIN_ILLDEFINED;
+        } else if (s.equals("MICROLOBULATED")) {
+            return MassMargin.MASS_MARGIN_MICROLOBULATED;
+        } else if (s.equals("OBSCURED")) {
+            return MassMargin.MASS_MARGIN_OBSCURED;
+        } else if (s.equals("SPICULATED")) {
+            return MassMargin.MASS_MARGIN_SPICULATED;
+        } else {
+            return null;
+        }
+    }
+
+    private MassShape parseShape(String s) {
+        if (s.equals("IRREGULAR")) {
+            return MassShape.MASS_SHAPE_IRREGULAR;
+        } else if (s.equals("LOBULATED")) {
+            return MassShape.MASS_SHAPE_LOBULATED;
+        } else if (s.equals("OVAL")) {
+            return MassShape.MASS_SHAPE_OVAL;
+        } else if (s.equals("ROUND")) {
+            return MassShape.MASS_SHAPE_ROUND;
+        } else {
+            return null;
+        }
+    }
+
+    private Biopsy parseBiopsy(String s) {
+        if (s.equals("MALIGNANT")) {
+            return Biopsy.BIOPSY_MALIGNANT;
+        } else if (s.equals("BENIGN")) {
+            return Biopsy.BIOPSY_BENIGN;
+        } else {
+            return null;
         }
     }
 }

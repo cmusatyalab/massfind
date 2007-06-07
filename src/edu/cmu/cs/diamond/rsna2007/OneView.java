@@ -1,9 +1,6 @@
 package edu.cmu.cs.diamond.rsna2007;
 
-import java.awt.Dimension;
-import java.awt.Graphics;
-import java.awt.Insets;
-import java.awt.Point;
+import java.awt.*;
 import java.awt.image.BufferedImage;
 
 import javax.swing.JPanel;
@@ -11,7 +8,7 @@ import javax.swing.JPanel;
 import edu.cmu.cs.diamond.opendiamond.Util;
 
 public class OneView extends JPanel {
-    final private BufferedImage img;
+    final private CasePiece casePiece;
 
     protected BufferedImage scaledImg;
 
@@ -29,18 +26,18 @@ public class OneView extends JPanel {
 
     final private String viewName;
 
-    public OneView(BufferedImage img, String viewName, int unscaledHeight) {
+    public OneView(CasePiece casePiece, String viewName, int unscaledHeight) {
         super();
 
         setBackground(null);
 
-        this.img = img;
+        this.casePiece = casePiece;
 
         this.viewName = viewName;
 
         this.unscaledHeight = unscaledHeight;
 
-        int w = img.getWidth();
+        int w = casePiece.getImage().getWidth();
         int h = unscaledHeight;
         setPreferredSize(new Dimension(w, h));
         setMinimumSize(new Dimension(w / 2, h / 2));
@@ -63,6 +60,19 @@ public class OneView extends JPanel {
         // g.setColor(Color.WHITE);
         // g.drawString(Double.toString(scale),
         // g.getFontMetrics().getMaxAscent() + 10, 20);
+
+        Truth t = casePiece.getTruth();
+        if (t != null) {
+            ROI r = t.getROI();
+            if (r != null) {
+                Graphics2D g2 = (Graphics2D) g;
+                g2.setColor(Color.WHITE);
+                
+                Shape s = r.getContour();
+                System.out.println(s);
+                g2.draw(s);
+            }
+        }
     }
 
     private void drawScaledImg() {
@@ -70,14 +80,14 @@ public class OneView extends JPanel {
         final int cW = getWidth() - in.left - in.right;
         final int cH = getHeight() - in.top - in.bottom;
 
-        final int w = img.getWidth();
+        final int w = casePiece.getImage().getWidth();
         final int h = unscaledHeight;
 
         scale = Util.getScaleForResize(w, h, cW, cH);
 
         final int sW = (int) (w * scale);
 
-        scaledImg = Util.scaleImageFast(img, scale);
+        scaledImg = Util.scaleImageFast(casePiece.getImage(), scale);
 
         // center in X
         drawPosX = (cW - sW) / 2 + in.left;
@@ -85,7 +95,7 @@ public class OneView extends JPanel {
     }
 
     public BufferedImage getImage() {
-        return img;
+        return casePiece.getImage();
     }
 
     public Point getImagePoint(Point p) {
