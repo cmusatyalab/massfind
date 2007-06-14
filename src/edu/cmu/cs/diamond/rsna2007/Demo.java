@@ -46,7 +46,7 @@ public class Demo extends JFrame {
             m.setDefaultCloseOperation(JFrame.EXIT_ON_CLOSE);
             DisplayMode dm = gd.getDisplayMode();
 
-            if (true) {
+            if (false) {
                 m.setUndecorated(true);
                 m.setResizable(false);
             }
