@@ -74,6 +74,14 @@ public class SearchPanel extends JPanel implements ListSelectionListener {
             if (theSearch != null) {
                 theSearch.stop();
             }
+
+            // deregister listeners
+            ListModel oldModel = list.getModel();
+            if (oldModel instanceof SearchModel) {
+                SearchModel m = (SearchModel) oldModel;
+                m.removeSearchListener();
+            }
+            
             caseViewer.setSelectedResult(null);
         }
     }

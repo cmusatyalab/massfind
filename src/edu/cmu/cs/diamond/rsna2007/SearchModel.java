@@ -58,8 +58,6 @@ public class SearchModel extends DefaultListModel implements
                 } catch (InterruptedException e) {
                 } finally {
                     System.out.println("search done");
-                    SearchModel.this.search
-                            .removeSearchEventListener(SearchModel.this);
                     running = false;
                 }
             }
@@ -78,5 +76,9 @@ public class SearchModel extends DefaultListModel implements
 
     public void searchStopped(SearchEvent e) {
         running = false;
+    }
+
+    public void removeSearchListener() {
+        search.removeSearchEventListener(this);
     }
 }

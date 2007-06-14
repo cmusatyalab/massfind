@@ -121,19 +121,26 @@ public class CaseViewer extends JLayeredPane {
         addMouseListener(mouseListener);
 
         addMouseMotionListener(mouseMotionListener);
+
+        for (int i = 0; i < views.length; i++) {
+            OneView o = new OneView();
+            o.addMouseListener(mouseListener);
+            o.addMouseMotionListener(mouseMotionListener);
+            views[i] = o;
+        }
     }
 
     public void setCase(Case c) {
         theCase = c;
 
-        views[0] = new OneView(theCase.getRightCC(), "RCC", theCase
+        views[0].setView(theCase.getRightCC(), "RCC", theCase
                 .getMaximumHeight());
-        views[1] = new OneView(theCase.getLeftCC(), "LCC", theCase
+        views[1]
+                .setView(theCase.getLeftCC(), "LCC", theCase.getMaximumHeight());
+        views[2].setView(theCase.getRightML(), "RML", theCase
                 .getMaximumHeight());
-        views[2] = new OneView(theCase.getRightML(), "RML", theCase
-                .getMaximumHeight());
-        views[3] = new OneView(theCase.getLeftML(), "LML", theCase
-                .getMaximumHeight());
+        views[3]
+                .setView(theCase.getLeftML(), "LML", theCase.getMaximumHeight());
 
         removeAll();
         add(leftSearchResults, new Integer(10));
@@ -144,8 +151,6 @@ public class CaseViewer extends JLayeredPane {
 
         for (OneView o : views) {
             add(o, JLayeredPane.DEFAULT_LAYER);
-            o.addMouseListener(mouseListener);
-            o.addMouseMotionListener(mouseMotionListener);
         }
 
         // add layout constraints
@@ -211,7 +216,7 @@ public class CaseViewer extends JLayeredPane {
         magnifierWindow.setMagnifyPoint(magX, magY);
         magnifierWindow.repaint();
     }
-    
+
     protected void updateMagnifierPosition(MouseEvent e) {
         updateMagnifierPosition(e.getX(), e.getY(), e.getComponent());
     }

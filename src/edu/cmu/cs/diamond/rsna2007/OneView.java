@@ -10,7 +10,7 @@ import javax.swing.JPanel;
 import edu.cmu.cs.diamond.opendiamond.Util;
 
 public class OneView extends JPanel {
-    final private CasePiece casePiece;
+    private CasePiece casePiece;
 
     protected BufferedImage scaledImg;
 
@@ -20,19 +20,21 @@ public class OneView extends JPanel {
 
     private double scale;
 
-    final private int unscaledHeight;
+    private int unscaledHeight;
 
     private int oldW;
 
     private int oldH;
 
-    final private String viewName;
+    private String viewName;
 
-    public OneView(CasePiece casePiece, String viewName, int unscaledHeight) {
+    public OneView() {
         super();
 
         setBackground(null);
+    }
 
+    public void setView(CasePiece casePiece, String viewName, int unscaledHeight) {
         this.casePiece = casePiece;
 
         this.viewName = viewName;
@@ -45,16 +47,18 @@ public class OneView extends JPanel {
         setMinimumSize(new Dimension(w / 2, h / 2));
         setMaximumSize(new Dimension(w * 2, h * 2));
 
+        String toolTipText = null;
         Truth t = casePiece.getTruth();
         if (t != null && t.getBiopsy() == Truth.Biopsy.BIOPSY_MALIGNANT) {
-            setToolTipText("<html><table><tr><th>Age</th><td>" + t.getAge()
+            toolTipText = "<html><table><tr><th>Age</th><td>" + t.getAge()
                     + "</tr><tr><th>Shape</th><td>" + t.getShape()
                     + "</td></tr><tr><th>Margin</th><td>" + t.getMargin()
                     + "</td></tr><tr><th>BIRAD</th><td>" + t.getBirad()
                     + "</td></tr><tr><th>Density</th><td>" + t.getDensity()
                     + "</td></tr><tr><th>Subtlety</th><td>" + t.getSubtlety()
-                    + "</td></tr></table></html>");
+                    + "</td></tr></table></html>";
         }
+        setToolTipText(toolTipText);
     }
 
     @Override
@@ -128,7 +132,7 @@ public class OneView extends JPanel {
     public Truth getTruth() {
         return casePiece.getTruth();
     }
-    
+
     public Point getImagePoint(Point p) {
         return new Point((int) ((p.x - drawPosX) / scale),
                 (int) ((p.y - drawPosY) / scale));
