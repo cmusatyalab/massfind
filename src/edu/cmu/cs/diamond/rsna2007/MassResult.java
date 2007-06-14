@@ -19,7 +19,7 @@ public class MassResult extends Result {
     final private Result theResult;
 
     final private BufferedImage thumbnail;
-    
+
     final private BufferedImage image;
 
     final private boolean malignant;
@@ -44,16 +44,13 @@ public class MassResult extends Result {
             thumbnail = null;
             image = null;
             return;
-        } else if (b.getWidth() < size && b.getHeight() < size) {
-            double scale = Util.getScaleForResize(b.getWidth(), b.getHeight(),
-                    size, size);
-            t = Util.scaleImage(b, scale);
-        } else {
-            t = GraphicsUtilities.createThumbnail(b, size);
         }
 
+        double scale = Util.getScaleForResize(b.getWidth(), b.getHeight(),
+                size, size);
+        t = Util.scaleImageFast(b, scale);
+
         image = GraphicsUtilities.toCompatibleImage(b);
-        
 
         // draw border
         int w = t.getWidth() + (border + pad) * 2;

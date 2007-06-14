@@ -23,7 +23,7 @@ import edu.cmu.cs.diamond.rsna2007.Truth.MassMargin;
 import edu.cmu.cs.diamond.rsna2007.Truth.MassShape;
 
 public class Demo extends JFrame {
-    final static private boolean FULL_SCREEN = false;
+    final static private boolean FULL_SCREEN = true;
 
     final private CaseViewer caseViewer;
 
