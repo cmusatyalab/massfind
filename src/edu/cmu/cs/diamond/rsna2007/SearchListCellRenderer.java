@@ -5,9 +5,9 @@ import java.awt.Component;
 import javax.swing.*;
 import javax.swing.border.Border;
 
-public class SearchListCellRenderer extends DefaultListCellRenderer {
-    final private static Icon icon = new ImageIcon("/home/adam/adam-zz.png");
+import edu.cmu.cs.diamond.opendiamond.Util;
 
+public class SearchListCellRenderer extends DefaultListCellRenderer {
     final private static Border border = BorderFactory.createEmptyBorder(10,
             10, 10, 10);
 
@@ -23,14 +23,22 @@ public class SearchListCellRenderer extends DefaultListCellRenderer {
         DefaultListCellRenderer c = (DefaultListCellRenderer) super
                 .getListCellRendererComponent(list, value, index, isSelected,
                         cellHasFocus);
+        ThumbnailedResult r = (ThumbnailedResult) value;
+        int similarity = Util.extractInt(r.getValue("similarity"));
+        String text = Integer.toString(similarity);
+
+        c.setText(text);
+
+        Icon icon = new ImageIcon(r.getThumbnail());
+
         c.setIcon(icon);
 
         c.setBorder(border);
 
         c.setOpaque(isSelected);
-        
-        c.setToolTipText(value.toString());
-        
+
+        c.setToolTipText("Similarity: " + text);
+
         return c;
     }
 }

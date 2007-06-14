@@ -15,7 +15,8 @@ import edu.cmu.cs.diamond.opendiamond.Search;
 public class SearchPanel extends JPanel {
 
     final private JList list;
-    private Search theSearch;
+
+    protected Search theSearch;
 
     public SearchPanel() {
         setOpaque(false);
@@ -24,18 +25,13 @@ public class SearchPanel extends JPanel {
         setBorder(BorderFactory.createTitledBorder(null, "Search Results",
                 TitledBorder.CENTER, TitledBorder.TOP, null, Color.WHITE));
 
-        String data[] = new String[100000];
-        for (int i = 0; i < data.length; i++) {
-            data[i] = Integer.toString(i);
-        }
-        
         SearchListCellRenderer cr = new SearchListCellRenderer();
-        list = new JList(data);
+        list = new JList();
         list.setCellRenderer(cr);
         list.setSelectionMode(ListSelectionModel.SINGLE_SELECTION);
         list.setLayoutOrientation(JList.HORIZONTAL_WRAP);
         list.setVisibleRowCount(-1);
-        
+
         list.setOpaque(false);
         list.setBackground(null);
         list.setForeground(Color.WHITE);
@@ -51,32 +47,36 @@ public class SearchPanel extends JPanel {
         v.setBackground(null);
 
         add(jsp);
-        
+
         JButton closeButton = new JButton("Close Search");
         closeButton.addActionListener(new ActionListener() {
             public void actionPerformed(ActionEvent e) {
-                stopSearch();
                 setVisible(false);
             }
         });
         add(closeButton, BorderLayout.SOUTH);
     }
 
+    @Override
+    public void setVisible(boolean aFlag) {
+        super.setVisible(aFlag);
+        if (!aFlag && theSearch != null) {
+            theSearch.stop();
+        }
+    }
+
     void beginSearch(Search s) {
+        if (theSearch != null) {
+            theSearch.stop();
+        }
+
         theSearch = s;
-        
+
         list.setModel(new SearchModel(theSearch, 12));
-        
+
         theSearch.start();
 
-        // TODO results
-        
         setVisible(true);
-    }
-    
-    protected void stopSearch() {
-        // TODO Auto-generated method stub
-        
     }
 
     @Override

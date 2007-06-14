@@ -30,6 +30,7 @@ public class SearchModel extends DefaultListModel implements
                 synchronized (lock) {
                     while (!running) {
                         try {
+                            System.out.println("waiting for start signal");
                             lock.wait();
                         } catch (InterruptedException e) {
                             e.printStackTrace();
@@ -37,10 +38,9 @@ public class SearchModel extends DefaultListModel implements
                     }
                 }
 
-                int i = 0;
-                while (running && i < SearchModel.this.limit) {
-                    // pick one off
-                    try {
+                try {
+                    int i = 0;
+                    while (running && i < SearchModel.this.limit) {
                         final Result r = SearchModel.this.search
                                 .getNextResult();
                         if (r == null) {
@@ -49,13 +49,18 @@ public class SearchModel extends DefaultListModel implements
 
                         SwingUtilities.invokeLater(new Runnable() {
                             public void run() {
-                                addElement(r);
+                                System.out.println(" *** adding " + r);
+                                addElement(new ThumbnailedResult(r, 256));
                             }
                         });
-                    } catch (InterruptedException e) {
-                    } finally {
-                        running = false;
+                        i++;
                     }
+                } catch (InterruptedException e) {
+                } finally {
+                    System.out.println("search done");
+                    SearchModel.this.search
+                            .removeSearchEventListener(SearchModel.this);
+                    running = false;
                 }
             }
         });
@@ -65,6 +70,7 @@ public class SearchModel extends DefaultListModel implements
 
     public void searchStarted(SearchEvent e) {
         synchronized (lock) {
+            System.out.println("sending start notify");
             running = true;
             lock.notify();
         }

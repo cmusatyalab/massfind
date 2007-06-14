@@ -162,8 +162,10 @@ public class ROI {
 
     final private List<Point2D> contour;
 
-    final private double data[] = new double[50];
-    
+    final private double rawf[] = new double[50];
+    final private double edmf[] = new double[38];
+    final private double bdmf[] = new double[50];
+
     final private BufferedImage img;
 
     public ROI(InputStream in, BufferedImage img) throws IOException {
@@ -183,7 +185,13 @@ public class ROI {
 
                 if (key.startsWith("rawf")) {
                     int index = Integer.parseInt(key.substring(4));
-                    data[index] = Double.parseDouble(val);
+                    rawf[index] = Double.parseDouble(val);
+                } else if (key.startsWith("edmf")) {
+                    int index = Integer.parseInt(key.substring(4));
+                    edmf[index] = Double.parseDouble(val);
+                } else if (key.startsWith("bdmf")) {
+                    int index = Integer.parseInt(key.substring(4));
+                    bdmf[index] = Double.parseDouble(val);
                 } else if (key.equals("contourx")) {
                     contourX = readContour(val);
                 } else if (key.equals("contoury")) {
@@ -226,14 +234,26 @@ public class ROI {
     }
 
     public Point2D getCenter() {
-        return new Point2D.Double(data[UPMC_CENTER_X] * 4,
-                data[UPMC_CENTER_Y] * 4);
+        return new Point2D.Double(rawf[UPMC_CENTER_X] * 4,
+                rawf[UPMC_CENTER_Y] * 4);
     }
 
-    public double[] getData() {
+    public double[] getRawData() {
+        return getData(rawf);
+    }
+
+    private double[] getData(double data[]) {
         double d[] = new double[data.length];
         System.arraycopy(data, 0, d, 0, d.length);
         return d;
+    }
+
+    public double[] getEuclidianData() {
+        return getData(edmf);
+    }
+
+    public double[] getBoostedData() {
+        return getData(bdmf);
     }
 
     @Override
@@ -241,8 +261,8 @@ public class ROI {
         StringBuilder sb = new StringBuilder();
 
         sb.append("[");
-        for (int i = 0; i < data.length; i++) {
-            sb.append(" " + i + ":" + data[i]);
+        for (int i = 0; i < rawf.length; i++) {
+            sb.append(" " + i + ":" + rawf[i]);
         }
         sb.append(" ]");
 
@@ -250,7 +270,7 @@ public class ROI {
 
         return sb.toString();
     }
-    
+
     public BufferedImage getImage() {
         return img;
     }

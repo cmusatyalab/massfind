@@ -244,7 +244,7 @@ public class CaseViewer extends JLayeredPane {
         try {
             // TODO other types
 
-            double data[] = r.getData();
+            double data[] = r.getEuclidianData();
             String args[] = new String[data.length];
             for (int i = 0; i < data.length; i++) {
                 args[i] = Double.toString(data[i]);
