@@ -26,8 +26,6 @@ import edu.cmu.cs.diamond.opendiamond.Search;
 import edu.cmu.cs.diamond.opendiamond.Searchlet;
 
 public class CaseViewer extends JLayeredPane {
-    private final static int MAGNIFIER_SIZE = 512;
-
     private final static int SPACING = 10;
 
     private Case theCase;
@@ -109,7 +107,6 @@ public class CaseViewer extends JLayeredPane {
         setCursor(defaultCursor);
 
         magnifierWindow = new MagnifierWindow(this);
-        magnifierWindow.setSize(MAGNIFIER_SIZE, MAGNIFIER_SIZE);
 
         this.filterdir = filterdir;
 
@@ -208,8 +205,7 @@ public class CaseViewer extends JLayeredPane {
     protected void updateMagnifierPosition(MouseEvent e) {
         Point p = new Point(e.getX(), e.getY());
         SwingUtilities.convertPointToScreen(p, e.getComponent());
-        magnifierWindow.setLocation(p.x - MAGNIFIER_SIZE / 2, p.y
-                - MAGNIFIER_SIZE / 2);
+        magnifierWindow.setMagnifyPoint(p.x, p.y);
         magnifierWindow.repaint();
     }
 
@@ -272,7 +268,7 @@ public class CaseViewer extends JLayeredPane {
     }
 
     public void setSelectedResult(MassResult result) {
-        System.out.println(result);
+        magnifierWindow.setExtraResult(result);
     }
 
     // @Override

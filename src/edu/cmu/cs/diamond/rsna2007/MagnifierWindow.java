@@ -7,6 +7,10 @@ import javax.swing.JWindow;
 import javax.swing.SwingUtilities;
 
 public class MagnifierWindow extends JWindow {
+    private static final int MAGNIFIER_SIZE = 512;
+
+    private MassResult extraResult;
+
     protected class Magnifier extends JComponent {
         final private Font font = Font.decode(null);
 
@@ -78,11 +82,20 @@ public class MagnifierWindow extends JWindow {
 
     public MagnifierWindow(CaseViewer viewer) {
         super();
+        setSize(MAGNIFIER_SIZE, MAGNIFIER_SIZE);
         setBackground(Color.BLACK);
         getContentPane().setBackground(null);
         setCursor(CaseViewer.hiddenCursor);
         this.viewer = viewer;
 
         add(new Magnifier());
+    }
+
+    public void setExtraResult(MassResult result) {
+        this.extraResult = result;
+    }
+
+    public void setMagnifyPoint(int x, int y) {
+        setLocation(x - getWidth() / 2, y - getHeight() / 2);
     }
 }
