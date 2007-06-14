@@ -9,16 +9,22 @@ import java.awt.event.ActionListener;
 
 import javax.swing.*;
 import javax.swing.border.TitledBorder;
+import javax.swing.event.ListSelectionEvent;
+import javax.swing.event.ListSelectionListener;
 
 import edu.cmu.cs.diamond.opendiamond.Search;
 
-public class SearchPanel extends JPanel {
+public class SearchPanel extends JPanel implements ListSelectionListener {
 
     final private JList list;
 
     protected Search theSearch;
 
-    public SearchPanel() {
+    final private CaseViewer caseViewer;
+
+    public SearchPanel(CaseViewer c) {
+        caseViewer = c;
+
         setOpaque(false);
         setLayout(new BorderLayout());
 
@@ -48,6 +54,8 @@ public class SearchPanel extends JPanel {
 
         add(jsp);
 
+        list.getSelectionModel().addListSelectionListener(this);
+
         JButton closeButton = new JButton("Close Search");
         closeButton.addActionListener(new ActionListener() {
             public void actionPerformed(ActionEvent e) {
@@ -58,10 +66,15 @@ public class SearchPanel extends JPanel {
     }
 
     @Override
-    public void setVisible(boolean aFlag) {
-        super.setVisible(aFlag);
-        if (!aFlag && theSearch != null) {
-            theSearch.stop();
+    public void setVisible(boolean visible) {
+        boolean oldVisible = isVisible();
+        
+        super.setVisible(visible);
+        if (oldVisible != visible && !visible) {
+            if (theSearch != null) {
+                theSearch.stop();
+            }
+            caseViewer.setSelectedResult(null);
         }
     }
 
@@ -87,5 +100,12 @@ public class SearchPanel extends JPanel {
         g2.setColor(new Color(0, 0, 0, 0.8f));
 
         g2.fillRect(0, 0, getWidth(), getHeight());
+    }
+
+    public void valueChanged(ListSelectionEvent e) {
+        if (!e.getValueIsAdjusting()) {
+            MassResult r = (MassResult) list.getSelectedValue();
+            caseViewer.setSelectedResult(r);
+        }
     }
 }

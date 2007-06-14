@@ -45,9 +45,9 @@ public class CaseViewer extends JLayeredPane {
 
     final protected Cursor defaultCursor = new Cursor(Cursor.CROSSHAIR_CURSOR);
 
-    final private SearchPanel leftSearchResults = new SearchPanel();
+    final private SearchPanel leftSearchResults = new SearchPanel(this);
 
-    final private SearchPanel rightSearchResults = new SearchPanel();
+    final private SearchPanel rightSearchResults = new SearchPanel(this);
 
     final private MouseListener mouseListener = new MouseAdapter() {
         @Override
@@ -240,7 +240,7 @@ public class CaseViewer extends JLayeredPane {
         Searchlet s = new Searchlet();
 
         File f = new File(filterdir, "libfil_euclidian.a");
-//        File f = new File(filterdir, "fil_rgb.a");
+        // File f = new File(filterdir, "fil_rgb.a");
         try {
             // TODO other types
 
@@ -254,13 +254,13 @@ public class CaseViewer extends JLayeredPane {
             Filter ff = new Filter("filter", fc, "f_eval_euclidian",
                     "f_init_euclidian", "f_fini_euclidian", 60,
                     new String[] {}, args, 1);
-//            Filter ff = new Filter("filter", fc, "f_eval_img2rgb",
-//                    "f_init_img2rgb", "f_fini_img2rgb", 60,
-//                    new String[] {}, new String[] {}, 1);
+            // Filter ff = new Filter("filter", fc, "f_eval_img2rgb",
+            // "f_init_img2rgb", "f_fini_img2rgb", 60,
+            // new String[] {}, new String[] {}, 1);
             s.addFilter(ff);
 
             s.setApplicationDependencies(new String[] { "filter" });
-            
+
             System.out.println(s);
         } catch (FileNotFoundException e) {
             e.printStackTrace();
@@ -269,6 +269,10 @@ public class CaseViewer extends JLayeredPane {
         }
 
         return s;
+    }
+
+    public void setSelectedResult(MassResult result) {
+        System.out.println(result);
     }
 
     // @Override
