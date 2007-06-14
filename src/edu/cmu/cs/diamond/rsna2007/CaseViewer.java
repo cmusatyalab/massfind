@@ -4,12 +4,26 @@ import java.awt.Component;
 import java.awt.Cursor;
 import java.awt.Point;
 import java.awt.Toolkit;
-import java.awt.event.*;
+import java.awt.event.MouseAdapter;
+import java.awt.event.MouseEvent;
+import java.awt.event.MouseListener;
+import java.awt.event.MouseMotionAdapter;
+import java.awt.event.MouseMotionListener;
 import java.awt.image.BufferedImage;
+import java.io.File;
+import java.io.FileInputStream;
+import java.io.FileNotFoundException;
+import java.io.IOException;
 
 import javax.swing.JLayeredPane;
 import javax.swing.SpringLayout;
 import javax.swing.SwingUtilities;
+
+import edu.cmu.cs.diamond.opendiamond.Filter;
+import edu.cmu.cs.diamond.opendiamond.FilterCode;
+import edu.cmu.cs.diamond.opendiamond.ScopeSource;
+import edu.cmu.cs.diamond.opendiamond.Search;
+import edu.cmu.cs.diamond.opendiamond.Searchlet;
 
 public class CaseViewer extends JLayeredPane {
     private final static int MAGNIFIER_SIZE = 512;
@@ -58,7 +72,6 @@ public class CaseViewer extends JLayeredPane {
         public void mouseClicked(MouseEvent e) {
             if (e.getButton() == 1 && e.getClickCount() == 2) {
                 Component c = e.getComponent();
-                System.out.println(c);
 
                 if (c instanceof OneView) {
                     OneView ov = (OneView) c;
@@ -86,7 +99,9 @@ public class CaseViewer extends JLayeredPane {
         }
     };
 
-    public CaseViewer() {
+    final private File filterdir;
+
+    public CaseViewer(File filterdir) {
         super();
 
         setBackground(null);
@@ -95,6 +110,8 @@ public class CaseViewer extends JLayeredPane {
 
         magnifierWindow = new MagnifierWindow(this);
         magnifierWindow.setSize(MAGNIFIER_SIZE, MAGNIFIER_SIZE);
+
+        this.filterdir = filterdir;
 
         setLayout(layout);
 
@@ -204,11 +221,54 @@ public class CaseViewer extends JLayeredPane {
         System.out.println("start search");
         boolean searchPanelOnRight = (view == views[0] || view == views[1]);
 
+        Search search = Search.getSharedInstance();
+        // TODO fill in search parameters
+        search.setScope(ScopeSource.getPredefinedScopeList().get(0));
+        search.setSearchlet(prepareSearchlet(r));
+
+        SearchPanel s;
         if (searchPanelOnRight) {
-            rightSearchResults.setVisible(true);
+            s = rightSearchResults;
         } else {
-            leftSearchResults.setVisible(true);
+            s = leftSearchResults;
         }
+
+        s.beginSearch(search);
+    }
+
+    private Searchlet prepareSearchlet(ROI r) {
+        Searchlet s = new Searchlet();
+
+        File f = new File(filterdir, "libfil_euclidian.a");
+//        File f = new File(filterdir, "fil_rgb.a");
+        try {
+            // TODO other types
+
+            double data[] = r.getData();
+            String args[] = new String[data.length];
+            for (int i = 0; i < data.length; i++) {
+                args[i] = Double.toString(data[i]);
+            }
+
+            FilterCode fc = new FilterCode(new FileInputStream(f));
+            Filter ff = new Filter("filter", fc, "f_eval_euclidian",
+                    "f_init_euclidian", "f_fini_euclidian", 60,
+                    new String[] {}, args, 1);
+//            Filter ff = new Filter("filter", fc, "f_eval_img2rgb",
+//                    "f_init_img2rgb", "f_fini_img2rgb", 60,
+//                    new String[] {}, new String[] {}, 1);
+            s.addFilter(ff);
+
+            s.setApplicationDependencies(new String[] { "filter" });
+            
+            System.out.println(s);
+        } catch (FileNotFoundException e) {
+            e.printStackTrace();
+        } catch (IOException e) {
+            e.printStackTrace();
+        }
+
+        return s;
     }
 
     // @Override

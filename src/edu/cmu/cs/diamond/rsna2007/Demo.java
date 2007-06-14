@@ -23,7 +23,7 @@ import edu.cmu.cs.diamond.rsna2007.Truth.MassMargin;
 import edu.cmu.cs.diamond.rsna2007.Truth.MassShape;
 
 public class Demo extends JFrame {
-    final private CaseViewer caseViewer = new CaseViewer();
+    final private CaseViewer caseViewer;
 
     final private List<Case> cases = new ArrayList<Case>();
 
@@ -38,20 +38,42 @@ public class Demo extends JFrame {
     public static void main(String[] args) {
         Demo m;
 
+        if (args.length < 2) {
+            System.out.println("Usage: " + Demo.class.getName()
+                    + " index_file filter_dir");
+            System.exit(1);
+        }
+
+        File index = new File(args[0]);
+        File filterdir = new File(args[1]);
+
+        // verify files
+        if (!(index.canRead() && index.isFile())) {
+            System.out.println("error: index_file must be readable file");
+            System.exit(1);
+        }
+
+        if (!(filterdir.canRead() && filterdir.isDirectory())) {
+            System.out.println("error: filter_dir must be readable directory");
+            System.exit(1);
+        }
+
         GraphicsDevice gd = GraphicsEnvironment.getLocalGraphicsEnvironment()
                 .getDefaultScreenDevice();
 
         try {
-            m = new Demo(new File(args[0]));
+            m = new Demo(index, filterdir);
             m.setDefaultCloseOperation(JFrame.EXIT_ON_CLOSE);
             DisplayMode dm = gd.getDisplayMode();
 
             if (false) {
                 m.setUndecorated(true);
                 m.setResizable(false);
+                m.setBounds(0, 0, dm.getWidth(), dm.getHeight());
+            } else {
+                m.setSize(m.getMinimumSize());
             }
 
-            m.setBounds(0, 0, dm.getWidth(), dm.getHeight());
             m.toFront();
             m.setVisible(true);
         } catch (IOException e) {
@@ -59,8 +81,10 @@ public class Demo extends JFrame {
         }
     }
 
-    public Demo(File file) throws IOException {
+    public Demo(File index, File filterdir) throws IOException {
         super("Diamond RSNA 2007");
+
+        caseViewer = new CaseViewer(filterdir);
 
         setMinimumSize(new Dimension(640, 480));
 
@@ -69,7 +93,7 @@ public class Demo extends JFrame {
         Container cp = getContentPane();
         cp.setBackground(null);
 
-        readIndex(file);
+        readIndex(index);
 
         setupWindow();
 

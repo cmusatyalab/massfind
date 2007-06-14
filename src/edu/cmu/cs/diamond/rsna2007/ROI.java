@@ -230,8 +230,10 @@ public class ROI {
                 data[UPMC_CENTER_Y] * 4);
     }
 
-    public double getData(int index) {
-        return data[index];
+    public double[] getData() {
+        double d[] = new double[data.length];
+        System.arraycopy(data, 0, d, 0, d.length);
+        return d;
     }
 
     @Override

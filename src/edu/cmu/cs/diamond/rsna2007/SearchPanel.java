@@ -4,13 +4,18 @@ import java.awt.BorderLayout;
 import java.awt.Color;
 import java.awt.Graphics;
 import java.awt.Graphics2D;
+import java.awt.event.ActionEvent;
+import java.awt.event.ActionListener;
 
 import javax.swing.*;
 import javax.swing.border.TitledBorder;
 
+import edu.cmu.cs.diamond.opendiamond.Search;
+
 public class SearchPanel extends JPanel {
 
     final private JList list;
+    private Search theSearch;
 
     public SearchPanel() {
         setOpaque(false);
@@ -46,6 +51,32 @@ public class SearchPanel extends JPanel {
         v.setBackground(null);
 
         add(jsp);
+        
+        JButton closeButton = new JButton("Close Search");
+        closeButton.addActionListener(new ActionListener() {
+            public void actionPerformed(ActionEvent e) {
+                stopSearch();
+                setVisible(false);
+            }
+        });
+        add(closeButton, BorderLayout.SOUTH);
+    }
+
+    void beginSearch(Search s) {
+        theSearch = s;
+        
+        list.setModel(new SearchModel(theSearch, 12));
+        
+        theSearch.start();
+
+        // TODO results
+        
+        setVisible(true);
+    }
+    
+    protected void stopSearch() {
+        // TODO Auto-generated method stub
+        
     }
 
     @Override
