@@ -1,8 +1,13 @@
 package edu.cmu.cs.diamond.rsna2007;
 
 import java.awt.Component;
+import java.awt.image.BufferedImage;
 
-import javax.swing.*;
+import javax.swing.BorderFactory;
+import javax.swing.DefaultListCellRenderer;
+import javax.swing.ImageIcon;
+import javax.swing.JList;
+import javax.swing.SwingConstants;
 import javax.swing.border.Border;
 
 import edu.cmu.cs.diamond.opendiamond.Util;
@@ -23,21 +28,24 @@ public class SearchListCellRenderer extends DefaultListCellRenderer {
         DefaultListCellRenderer c = (DefaultListCellRenderer) super
                 .getListCellRendererComponent(list, value, index, isSelected,
                         cellHasFocus);
-        ThumbnailedResult r = (ThumbnailedResult) value;
+        MassResult r = (MassResult) value;
+
         int similarity = Util.extractInt(r.getValue("similarity"));
-        String text = Integer.toString(similarity);
+
+        String text = Integer.toString(similarity) + "%";
 
         c.setText(text);
 
-        Icon icon = new ImageIcon(r.getThumbnail());
+        BufferedImage thumb = r.getThumbnail();
 
-        c.setIcon(icon);
+        c.setIcon(new ImageIcon(thumb));
 
         c.setBorder(border);
 
         c.setOpaque(isSelected);
 
-        c.setToolTipText("Similarity: " + text);
+        c.setToolTipText((r.isMalignant() ? "Malignant" : "Benign")
+                + ", Similarity: " + text);
 
         return c;
     }

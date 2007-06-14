@@ -66,7 +66,7 @@ public class Demo extends JFrame {
             m.setDefaultCloseOperation(JFrame.EXIT_ON_CLOSE);
             DisplayMode dm = gd.getDisplayMode();
 
-            if (false) {
+            if (true) {
                 m.setUndecorated(true);
                 m.setResizable(false);
                 m.setBounds(0, 0, dm.getWidth(), dm.getHeight());
@@ -86,7 +86,7 @@ public class Demo extends JFrame {
 
         caseViewer = new CaseViewer(filterdir);
 
-        setMinimumSize(new Dimension(640, 480));
+        setMinimumSize(new Dimension(800, 600));
 
         setBackground(Color.BLACK);
 

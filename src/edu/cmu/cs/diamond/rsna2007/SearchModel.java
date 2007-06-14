@@ -50,7 +50,7 @@ public class SearchModel extends DefaultListModel implements
                         SwingUtilities.invokeLater(new Runnable() {
                             public void run() {
                                 System.out.println(" *** adding " + r);
-                                addElement(new ThumbnailedResult(r, 256));
+                                addElement(new MassResult(r, 256, 8, 4));
                             }
                         });
                         i++;
