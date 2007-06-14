@@ -23,6 +23,8 @@ import edu.cmu.cs.diamond.rsna2007.Truth.MassMargin;
 import edu.cmu.cs.diamond.rsna2007.Truth.MassShape;
 
 public class Demo extends JFrame {
+    final static private boolean FULL_SCREEN = false;
+
     final private CaseViewer caseViewer;
 
     final private List<Case> cases = new ArrayList<Case>();
@@ -66,7 +68,7 @@ public class Demo extends JFrame {
             m.setDefaultCloseOperation(JFrame.EXIT_ON_CLOSE);
             DisplayMode dm = gd.getDisplayMode();
 
-            if (true) {
+            if (FULL_SCREEN) {
                 m.setUndecorated(true);
                 m.setResizable(false);
                 m.setBounds(0, 0, dm.getWidth(), dm.getHeight());
