@@ -2,32 +2,37 @@ package edu.cmu.cs.diamond.rsna2007;
 
 import java.awt.*;
 
-import javax.swing.JComponent;
-import javax.swing.JWindow;
-import javax.swing.SwingUtilities;
+import javax.swing.*;
 
 public class MagnifierWindow extends JWindow {
     private static final int MAGNIFIER_SIZE = 512;
-
-    private MassResult extraResult;
 
     protected class Magnifier extends JComponent {
         final private Font font = Font.decode(null);
 
         final static private int BORDER_SIZE = 4;
 
+        public Magnifier() {
+            Dimension d = new Dimension(MAGNIFIER_SIZE, MAGNIFIER_SIZE);
+            setMinimumSize(d);
+            setPreferredSize(d);
+            setMaximumSize(d);
+        }
+
         @Override
         protected void paintComponent(Graphics g) {
             super.paintComponent(g);
 
+            final int w = getWidth();
+            final int h = getHeight();
+
             // figure out rectangle
-            Point cP = SwingUtilities.convertPoint(this, getWidth() / 2,
-                    getHeight() / 2, viewer);
-            Rectangle rect = SwingUtilities.convertRectangle(this, getBounds(),
-                    viewer);
+            Point cP = SwingUtilities.convertPoint(this, w / 2, h / 2, viewer);
+            Rectangle rect = SwingUtilities.convertRectangle(this,
+                    new Rectangle(w, h), viewer);
 
             // get all components
-            int half = getWidth() / 2;
+            int half = w / 2;
 
             for (OneView ov : viewer.getViews()) {
                 if (ov.getBounds().intersects(rect)) {
@@ -54,7 +59,7 @@ public class MagnifierWindow extends JWindow {
                 int sw = SwingUtilities.computeStringWidth(fm, label);
                 int sh = fm.getHeight();
                 int sx = half - sw / 2;
-                int sy = getHeight() - sh - BORDER_SIZE;
+                int sy = h - sh - BORDER_SIZE;
                 g.setColor(Color.BLACK);
                 g.fillRect(sx - 2, sy, sw + 4, sh);
                 g.setColor(Color.WHITE);
@@ -66,8 +71,8 @@ public class MagnifierWindow extends JWindow {
             Graphics2D g2 = (Graphics2D) g;
             g2.setColor(Color.GRAY);
             g2.setStroke(new BasicStroke(BORDER_SIZE));
-            g2.drawRect(BORDER_SIZE / 2, BORDER_SIZE / 2, getWidth()
-                    - BORDER_SIZE, getHeight() - BORDER_SIZE);
+            g2.drawRect(BORDER_SIZE / 2, BORDER_SIZE / 2, w - BORDER_SIZE, h
+                    - BORDER_SIZE);
 
             // draw center
             if (false) {
@@ -80,22 +85,48 @@ public class MagnifierWindow extends JWindow {
 
     final protected CaseViewer viewer;
 
+    final private Box box;
+
+    final private Magnifier mag;
+
     public MagnifierWindow(CaseViewer viewer) {
         super();
-        setSize(MAGNIFIER_SIZE, MAGNIFIER_SIZE);
         setBackground(Color.BLACK);
         getContentPane().setBackground(null);
         setCursor(CaseViewer.hiddenCursor);
         this.viewer = viewer;
 
-        add(new Magnifier());
+        box = Box.createHorizontalBox();
+
+        mag = new Magnifier();
+
+        add(box);
+
+        // packs the window
+        setExtraResult(null, false);
     }
 
-    public void setExtraResult(MassResult result) {
-        this.extraResult = result;
+    public void setExtraResult(MassResult result, boolean putOnRight) {
+        box.removeAll();
+
+        JLabel l = null;
+        if (result != null) {
+            l = new JLabel(new ImageIcon(result.getImage()));
+        }
+
+        if (!putOnRight && l != null) {
+            box.add(l);
+        }
+        box.add(mag);
+        if (putOnRight && l != null) {
+            box.add(l);
+        }
+
+        pack();
     }
 
     public void setMagnifyPoint(int x, int y) {
-        setLocation(x - getWidth() / 2, y - getHeight() / 2);
+        setLocation(x - mag.getX() - MAGNIFIER_SIZE / 2, y - mag.getY()
+                - MAGNIFIER_SIZE / 2);
     }
 }

@@ -99,6 +99,12 @@ public class CaseViewer extends JLayeredPane {
 
     final private File filterdir;
 
+    private boolean searchPanelOnRight;
+
+    private int magY;
+
+    private int magX;
+
     public CaseViewer(File filterdir) {
         super();
 
@@ -198,15 +204,24 @@ public class CaseViewer extends JLayeredPane {
 
         revalidate();
         repaint();
-
-        magnifierWindow.repaint();
+        updateMagnifierPosition();
     }
 
-    protected void updateMagnifierPosition(MouseEvent e) {
-        Point p = new Point(e.getX(), e.getY());
-        SwingUtilities.convertPointToScreen(p, e.getComponent());
-        magnifierWindow.setMagnifyPoint(p.x, p.y);
+    protected void updateMagnifierPosition() {
+        magnifierWindow.setMagnifyPoint(magX, magY);
         magnifierWindow.repaint();
+    }
+    
+    protected void updateMagnifierPosition(MouseEvent e) {
+        updateMagnifierPosition(e.getX(), e.getY(), e.getComponent());
+    }
+
+    protected void updateMagnifierPosition(int x, int y, Component c) {
+        Point p = new Point(x, y);
+        SwingUtilities.convertPointToScreen(p, c);
+        magX = p.x;
+        magY = p.y;
+        updateMagnifierPosition();
     }
 
     public OneView[] getViews() {
@@ -215,7 +230,7 @@ public class CaseViewer extends JLayeredPane {
 
     public void startSearch(OneView view, ROI r) {
         System.out.println("start search");
-        boolean searchPanelOnRight = (view == views[0] || view == views[1]);
+        searchPanelOnRight = (view == views[0] || view == views[1]);
 
         Search search = Search.getSharedInstance();
         // TODO fill in search parameters
@@ -268,7 +283,7 @@ public class CaseViewer extends JLayeredPane {
     }
 
     public void setSelectedResult(MassResult result) {
-        magnifierWindow.setExtraResult(result);
+        magnifierWindow.setExtraResult(result, searchPanelOnRight);
     }
 
     // @Override
