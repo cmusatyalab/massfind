@@ -10,8 +10,6 @@ import javax.swing.JList;
 import javax.swing.SwingConstants;
 import javax.swing.border.Border;
 
-import edu.cmu.cs.diamond.opendiamond.Util;
-
 public class SearchListCellRenderer extends DefaultListCellRenderer {
     final private static Border border = BorderFactory.createEmptyBorder(10,
             10, 10, 10);
@@ -30,7 +28,7 @@ public class SearchListCellRenderer extends DefaultListCellRenderer {
                         cellHasFocus);
         MassResult r = (MassResult) value;
 
-        int similarity = Util.extractInt(r.getValue("similarity"));
+        int similarity = r.getSimilarity();
 
         String text = Integer.toString(similarity) + "%";
 

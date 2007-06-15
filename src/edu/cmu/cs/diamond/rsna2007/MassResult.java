@@ -24,11 +24,16 @@ public class MassResult extends Result {
 
     final private boolean malignant;
 
+    final private int similarity;
+
     public MassResult(Result r, int size, int border, int pad) {
         theResult = r;
 
         // is malignant?
         malignant = new String(theResult.getValue("name")).startsWith("TM");
+
+        // similarity
+        similarity = Util.extractInt(theResult.getValue("similarity"));
 
         // read image
         BufferedImage b = null;
@@ -105,5 +110,9 @@ public class MassResult extends Result {
 
     public BufferedImage getImage() {
         return image;
+    }
+
+    public int getSimilarity() {
+        return similarity;
     }
 }
