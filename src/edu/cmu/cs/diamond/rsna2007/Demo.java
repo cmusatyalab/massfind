@@ -119,13 +119,13 @@ public class Demo extends JFrame {
 
         readIndex(index);
 
-        setupWindow();
+        setupWindow(new File(index.getParentFile(), "logos"));
 
         updateButtonAndCaseState();
     }
 
-    private void setupWindow() {
-        add(new Banner(), BorderLayout.NORTH);
+    private void setupWindow(File logoDir) {
+        add(new Banner(logoDir), BorderLayout.NORTH);
 
         add(caseViewer);
 
