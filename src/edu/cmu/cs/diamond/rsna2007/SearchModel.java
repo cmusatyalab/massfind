@@ -58,7 +58,7 @@ public class SearchModel extends AbstractListModel implements
                         SwingUtilities.invokeLater(new Runnable() {
                             public void run() {
                                 System.out.println(" *** adding " + r);
-                                list.add(new MassResult(r, 256, 8, 4));
+                                list.add(new MassResult(r, 256, 4, 8));
                                 int index = list.size();
                                 fireIntervalAdded(SearchModel.this, index,
                                         index);

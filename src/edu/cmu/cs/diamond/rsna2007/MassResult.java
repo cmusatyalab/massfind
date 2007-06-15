@@ -64,11 +64,13 @@ public class MassResult extends Result {
 
         newThumb = GraphicsUtilities.createCompatibleTranslucentImage(w, h);
         Graphics2D g = newThumb.createGraphics();
+        g.setStroke(new BasicStroke(border));
         if (malignant) {
-            g.setStroke(new BasicStroke(border));
-            g.setColor(Color.WHITE);
-            g.drawRect(border / 2, border / 2, w - border, h - border);
+            g.setColor(Color.RED);
+        } else {
+            g.setColor(Color.BLUE);
         }
+        g.drawRect(border / 2, border / 2, w - border, h - border);
         g.drawImage(t, border + pad, border + pad, null);
         g.dispose();
 
