@@ -18,6 +18,8 @@ import javax.swing.JButton;
 import javax.swing.JFrame;
 import javax.swing.JLabel;
 
+import edu.cmu.cs.diamond.opendiamond.Scope;
+import edu.cmu.cs.diamond.opendiamond.ScopeSource;
 import edu.cmu.cs.diamond.rsna2007.Truth.Biopsy;
 import edu.cmu.cs.diamond.rsna2007.Truth.MassMargin;
 import edu.cmu.cs.diamond.rsna2007.Truth.MassShape;
@@ -40,9 +42,9 @@ public class Demo extends JFrame {
     public static void main(String[] args) {
         Demo m;
 
-        if (args.length < 2) {
+        if (args.length < 3) {
             System.out.println("Usage: " + Demo.class.getName()
-                    + " index_file filter_dir");
+                    + " index_file filter_dir scope_name");
             System.exit(1);
         }
 
@@ -60,11 +62,31 @@ public class Demo extends JFrame {
             System.exit(1);
         }
 
+        // verify scope
+        String scopeName = args[2];
+        List<Scope> scopes = ScopeSource.getPredefinedScopeList();
+        Scope theScope = null;
+        for (Scope scope : scopes) {
+            if (scope.getName().equals(scopeName)) {
+                theScope = scope;
+                break;
+            }
+        }
+        if (theScope == null) {
+            System.out.println("scope_name \"" + scopeName + "\" not found");
+            System.out.println("Available scopes:");
+            for (Scope scope : scopes) {
+                System.out.println(" " + scope.getName());
+            }
+            System.exit(1);
+        }
+        
+        
         GraphicsDevice gd = GraphicsEnvironment.getLocalGraphicsEnvironment()
                 .getDefaultScreenDevice();
 
         try {
-            m = new Demo(index, filterdir);
+            m = new Demo(index, filterdir, theScope);
             m.setDefaultCloseOperation(JFrame.EXIT_ON_CLOSE);
             DisplayMode dm = gd.getDisplayMode();
 
@@ -83,10 +105,10 @@ public class Demo extends JFrame {
         }
     }
 
-    public Demo(File index, File filterdir) throws IOException {
+    public Demo(File index, File filterdir, Scope scope) throws IOException {
         super("Diamond RSNA 2007");
 
-        caseViewer = new CaseViewer(filterdir);
+        caseViewer = new CaseViewer(filterdir, scope);
 
         setMinimumSize(new Dimension(800, 600));
 
