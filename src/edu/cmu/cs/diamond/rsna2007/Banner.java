@@ -30,7 +30,7 @@ public class Banner extends JPanel {
             }
         });
 
-        if (logos.length == 0) {
+        if (logos == null || logos.length == 0) {
             JLabel l = new JLabel("Diamond!");
             l.setForeground(Color.WHITE);
             add(l);
