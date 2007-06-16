@@ -107,6 +107,33 @@ public class CaseViewer extends JLayeredPane {
 
     protected SearchType searchType;
 
+    final private JCheckBoxMenuItem visSizeCheckbox = new JCheckBoxMenuItem(
+            "ROI Size");
+
+    final private JCheckBoxMenuItem visShapeFactorCheckbox = new JCheckBoxMenuItem(
+            "ROI Circularity");
+
+    final private JCheckBoxMenuItem visCircularityCheckbox = new JCheckBoxMenuItem(
+            "Shape Factor");
+
+    final private JSpinner visSizeMin = new JSpinner(new SpinnerNumberModel(
+            1.0, 0.0, 1.0, 0.1));
+
+    final private JSpinner visSizeMax = new JSpinner(new SpinnerNumberModel(
+            1.0, 1.0, 10.0, 0.1));
+
+    final private JSpinner visCircularityMin = new JSpinner(
+            new SpinnerNumberModel(1.0, 0.0, 1.0, 0.1));
+
+    final private JSpinner visCircularityMax = new JSpinner(
+            new SpinnerNumberModel(1.0, 1.0, 10.0, 0.1));
+
+    final private JSpinner visShapeFactorMin = new JSpinner(
+            new SpinnerNumberModel(1.0, 0.0, 1.0, 0.1));
+
+    final private JSpinner visShapeFactorMax = new JSpinner(
+            new SpinnerNumberModel(1.0, 1.0, 10.0, 0.1));
+
     public CaseViewer(File filterdir, Scope scope) {
         super();
 
@@ -161,13 +188,27 @@ public class CaseViewer extends JLayeredPane {
 
         popup.add(subpop);
 
-
         subpop = new JMenu("Search Threshold");
         thresholdSlider.setMajorTickSpacing(20);
         thresholdSlider.setMinorTickSpacing(5);
         thresholdSlider.setPaintTicks(true);
         thresholdSlider.setPaintLabels(true);
         subpop.add(thresholdSlider);
+        popup.add(subpop);
+
+        subpop = new JMenu("Visual Constraints");
+        subpop.add(visSizeCheckbox);
+        subpop.add(visSizeMin);
+        subpop.add(visSizeMax);
+        subpop.addSeparator();
+        subpop.add(visCircularityCheckbox);
+        subpop.add(visCircularityMin);
+        subpop.add(visCircularityMax);
+        subpop.addSeparator();
+        subpop.add(visShapeFactorCheckbox);
+        subpop.add(visShapeFactorMin);
+        subpop.add(visShapeFactorMax);
+
         popup.add(subpop);
 
         popup.addSeparator();
@@ -307,7 +348,7 @@ public class CaseViewer extends JLayeredPane {
         Search search = Search.getSharedInstance();
         // TODO fill in search parameters
         search.setScope(scope);
-        search.setSearchlet(prepareSearchlet(r, searchType, thresholdSlider.getValue()));
+        search.setSearchlet(prepareSearchlet(r));
 
         SearchPanel s;
         if (searchPanelOnRight) {
@@ -323,18 +364,15 @@ public class CaseViewer extends JLayeredPane {
         SEARCH_TYPE_EUCLIDIAN, SEARCH_TYPE_BOOSTED_LEARNED, SEARCH_TYPE_QUERY_ADAPTIVE_LEARNED
     }
 
-    private Searchlet prepareSearchlet(ROI r, SearchType type, int threshold) {
+    private Searchlet prepareSearchlet(ROI r) {
         Searchlet s = new Searchlet();
-
-        System.out.println(type);
-        System.out.println(threshold);
 
         try {
             String filename;
             double data[];
             String functionName;
 
-            switch (type) {
+            switch (searchType) {
             case SEARCH_TYPE_EUCLIDIAN:
                 filename = "libfil_euclidian.a";
                 data = r.getEuclidianData();
@@ -365,8 +403,48 @@ public class CaseViewer extends JLayeredPane {
             FilterCode fc = new FilterCode(new FileInputStream(f));
             Filter ff = new Filter("filter", fc, "f_eval_" + functionName,
                     "f_init_" + functionName, "f_fini_" + functionName,
-                    threshold, new String[] {}, args, 1);
+                    thresholdSlider.getValue(), new String[] {}, args, 1);
             s.addFilter(ff);
+
+            if (visSizeCheckbox.isSelected()
+                    || visCircularityCheckbox.isSelected()
+                    || visShapeFactorCheckbox.isSelected()) {
+                // visual
+                double visArgs[] = new double[6];
+                for (int i = 0; i < visArgs.length; i++) {
+                    visArgs[i] = -1;
+                }
+
+                if (visSizeCheckbox.isSelected()) {
+                    visArgs[0] = (Double) visSizeMin.getValue();
+                    visArgs[1] = (Double) visSizeMax.getValue();
+                }
+                if (visCircularityCheckbox.isSelected()) {
+                    visArgs[2] = (Double) visCircularityMin.getValue();
+                    visArgs[3] = (Double) visCircularityMax.getValue();
+                }
+                if (visShapeFactorCheckbox.isSelected()) {
+                    visArgs[4] = (Double) visShapeFactorMin.getValue();
+                    visArgs[5] = (Double) visShapeFactorMax.getValue();
+                }
+
+                double rawData[] = r.getRawData();
+                String visArgsStr[] = new String[rawData.length
+                        + visArgs.length];
+                for (int i = 0; i < rawData.length; i++) {
+                    visArgsStr[i] = Double.toString(rawData[i]);
+                }
+                for (int i = 0; i < visArgs.length; i++) {
+                    visArgsStr[i + rawData.length] = Double
+                            .toString(visArgs[i]);
+                }
+
+                f = new File(filterdir, "libfil_visual.a");
+                fc = new FilterCode(new FileInputStream(f));
+                ff = new Filter("visual", fc, "f_eval_visual", "f_init_visual",
+                        "f_fini_visual", 1, new String[0], visArgsStr, 1);
+                s.addFilter(ff);
+            }
 
             s.setApplicationDependencies(new String[] { "filter" });
 
