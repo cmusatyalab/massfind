@@ -15,7 +15,6 @@ import javax.swing.event.ListSelectionListener;
 import edu.cmu.cs.diamond.opendiamond.Search;
 
 public class SearchPanel extends JPanel implements ListSelectionListener {
-
     final protected JList list;
 
     protected Search theSearch;

@@ -5,7 +5,6 @@ import java.util.Comparator;
 import java.util.LinkedList;
 import java.util.List;
 
-import javax.naming.directory.SearchResult;
 import javax.swing.AbstractListModel;
 import javax.swing.SwingUtilities;
 
