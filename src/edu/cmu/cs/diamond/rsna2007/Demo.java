@@ -13,10 +13,7 @@ import java.util.regex.Matcher;
 import java.util.regex.Pattern;
 
 import javax.imageio.ImageIO;
-import javax.swing.Box;
-import javax.swing.JButton;
-import javax.swing.JFrame;
-import javax.swing.JLabel;
+import javax.swing.*;
 
 import edu.cmu.cs.diamond.opendiamond.Scope;
 import edu.cmu.cs.diamond.opendiamond.ScopeSource;
@@ -125,10 +122,11 @@ public class Demo extends JFrame {
     }
 
     private void setupWindow(File logoDir) {
-        add(new Banner(logoDir), BorderLayout.NORTH);
-
+        Banner banner = new Banner(logoDir);
+        
+        add(banner, BorderLayout.NORTH);
         add(caseViewer);
-
+        
         Box h = Box.createHorizontalBox();
 
         prevButton.addActionListener(new ActionListener() {
