@@ -4,22 +4,22 @@ import java.awt.Component;
 import java.awt.Cursor;
 import java.awt.Point;
 import java.awt.Toolkit;
-import java.awt.event.MouseAdapter;
-import java.awt.event.MouseEvent;
-import java.awt.event.MouseListener;
-import java.awt.event.MouseMotionAdapter;
-import java.awt.event.MouseMotionListener;
+import java.awt.event.*;
 import java.awt.image.BufferedImage;
 import java.io.File;
 import java.io.FileInputStream;
 import java.io.FileNotFoundException;
 import java.io.IOException;
 
-import javax.swing.JLayeredPane;
-import javax.swing.SpringLayout;
-import javax.swing.SwingUtilities;
+import javax.swing.*;
+import javax.swing.event.ChangeEvent;
+import javax.swing.event.ChangeListener;
 
-import edu.cmu.cs.diamond.opendiamond.*;
+import edu.cmu.cs.diamond.opendiamond.Filter;
+import edu.cmu.cs.diamond.opendiamond.FilterCode;
+import edu.cmu.cs.diamond.opendiamond.Scope;
+import edu.cmu.cs.diamond.opendiamond.Search;
+import edu.cmu.cs.diamond.opendiamond.Searchlet;
 
 public class CaseViewer extends JLayeredPane {
     private final static int SPACING = 10;
@@ -103,11 +103,15 @@ public class CaseViewer extends JLayeredPane {
 
     final private Scope scope;
 
+    final protected JSlider thresholdSlider = new JSlider(0, 100, 60);
+
+    protected SearchType searchType;
+
     public CaseViewer(File filterdir, Scope scope) {
         super();
 
         this.scope = scope;
-        
+
         setBackground(null);
 
         setCursor(defaultCursor);
@@ -122,12 +126,75 @@ public class CaseViewer extends JLayeredPane {
 
         addMouseMotionListener(mouseMotionListener);
 
+        // popup
+        JPopupMenu popup = makePopup();
+        setComponentPopupMenu(popup);
+
         for (int i = 0; i < views.length; i++) {
             OneView o = new OneView();
             o.addMouseListener(mouseListener);
             o.addMouseMotionListener(mouseMotionListener);
+            o.setComponentPopupMenu(popup);
             views[i] = o;
         }
+    }
+
+    private JPopupMenu makePopup() {
+        JPopupMenu popup = new JPopupMenu();
+        JMenuItem m;
+
+        ButtonGroup searchGroup = new ButtonGroup();
+        JRadioButtonMenuItem mr;
+        JMenu subpop = new JMenu("Distance Metric");
+        mr = createTypeMenu("Euclidian", SearchType.SEARCH_TYPE_EUCLIDIAN,
+                searchGroup);
+        mr.setSelected(true);
+        subpop.add(mr);
+
+        mr = createTypeMenu("Boosted Learned",
+                SearchType.SEARCH_TYPE_BOOSTED_LEARNED, searchGroup);
+        subpop.add(mr);
+
+        mr = createTypeMenu("Query Adaptive Learned",
+                SearchType.SEARCH_TYPE_QUERY_ADAPTIVE_LEARNED, searchGroup);
+        subpop.add(mr);
+
+        popup.add(subpop);
+
+
+        subpop = new JMenu("Search Threshold");
+        thresholdSlider.setMajorTickSpacing(20);
+        thresholdSlider.setMinorTickSpacing(5);
+        thresholdSlider.setPaintTicks(true);
+        thresholdSlider.setPaintLabels(true);
+        subpop.add(thresholdSlider);
+        popup.add(subpop);
+
+        popup.addSeparator();
+
+        m = new JMenuItem("Exit");
+        m.addActionListener(new ActionListener() {
+            public void actionPerformed(ActionEvent e) {
+                System.exit(0);
+            }
+        });
+        popup.add(m);
+        return popup;
+    }
+
+    private JRadioButtonMenuItem createTypeMenu(String text,
+            final SearchType type, ButtonGroup searchGroup) {
+        final JRadioButtonMenuItem mr;
+        mr = new JRadioButtonMenuItem(text);
+        mr.addChangeListener(new ChangeListener() {
+            public void stateChanged(ChangeEvent e) {
+                if (mr.isSelected()) {
+                    searchType = type;
+                }
+            }
+        });
+        searchGroup.add(mr);
+        return mr;
     }
 
     public void setCase(Case c) {
@@ -240,7 +307,7 @@ public class CaseViewer extends JLayeredPane {
         Search search = Search.getSharedInstance();
         // TODO fill in search parameters
         search.setScope(scope);
-        search.setSearchlet(prepareSearchlet(r));
+        search.setSearchlet(prepareSearchlet(r, searchType, thresholdSlider.getValue()));
 
         SearchPanel s;
         if (searchPanelOnRight) {
@@ -252,27 +319,53 @@ public class CaseViewer extends JLayeredPane {
         s.beginSearch(search);
     }
 
-    private Searchlet prepareSearchlet(ROI r) {
+    public enum SearchType {
+        SEARCH_TYPE_EUCLIDIAN, SEARCH_TYPE_BOOSTED_LEARNED, SEARCH_TYPE_QUERY_ADAPTIVE_LEARNED
+    }
+
+    private Searchlet prepareSearchlet(ROI r, SearchType type, int threshold) {
         Searchlet s = new Searchlet();
 
-        File f = new File(filterdir, "libfil_euclidian.a");
-        // File f = new File(filterdir, "fil_rgb.a");
-        try {
-            // TODO other types
+        System.out.println(type);
+        System.out.println(threshold);
 
-            double data[] = r.getEuclidianData();
+        try {
+            String filename;
+            double data[];
+            String functionName;
+
+            switch (type) {
+            case SEARCH_TYPE_EUCLIDIAN:
+                filename = "libfil_euclidian.a";
+                data = r.getEuclidianData();
+                functionName = "euclidian";
+                break;
+            case SEARCH_TYPE_BOOSTED_LEARNED:
+                filename = "libfil_boostldm.a";
+                data = r.getBoostedData();
+                functionName = "boostldm";
+                break;
+            case SEARCH_TYPE_QUERY_ADAPTIVE_LEARNED:
+                filename = "libfil_qaldm.a";
+                data = r.getEuclidianData();
+                functionName = "qaldm";
+                break;
+            default:
+                filename = null;
+                data = null;
+                functionName = null;
+            }
+
+            File f = new File(filterdir, filename);
             String args[] = new String[data.length];
             for (int i = 0; i < data.length; i++) {
                 args[i] = Double.toString(data[i]);
             }
 
             FilterCode fc = new FilterCode(new FileInputStream(f));
-            Filter ff = new Filter("filter", fc, "f_eval_euclidian",
-                    "f_init_euclidian", "f_fini_euclidian", 60,
-                    new String[] {}, args, 1);
-            // Filter ff = new Filter("filter", fc, "f_eval_img2rgb",
-            // "f_init_img2rgb", "f_fini_img2rgb", 60,
-            // new String[] {}, new String[] {}, 1);
+            Filter ff = new Filter("filter", fc, "f_eval_" + functionName,
+                    "f_init_" + functionName, "f_fini_" + functionName,
+                    threshold, new String[] {}, args, 1);
             s.addFilter(ff);
 
             s.setApplicationDependencies(new String[] { "filter" });
