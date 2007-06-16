@@ -96,13 +96,17 @@ public class SearchPanel extends JPanel implements ListSelectionListener {
             }
 
             // deregister listeners
-            ListModel oldModel = list.getModel();
-            if (oldModel instanceof SearchModel) {
-                SearchModel m = (SearchModel) oldModel;
-                m.removeSearchListener();
-            }
+            deregisterListener();
 
             caseViewer.setSelectedResult(null);
+        }
+    }
+
+    private void deregisterListener() {
+        ListModel oldModel = list.getModel();
+        if (oldModel instanceof SearchModel) {
+            SearchModel m = (SearchModel) oldModel;
+            m.removeSearchListener();
         }
     }
 
@@ -112,6 +116,8 @@ public class SearchPanel extends JPanel implements ListSelectionListener {
         }
 
         theSearch = s;
+        
+        deregisterListener();
 
         list.setModel(new SearchModel(theSearch, Integer.MAX_VALUE));
 
