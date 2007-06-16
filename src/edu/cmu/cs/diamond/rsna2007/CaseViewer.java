@@ -110,10 +110,10 @@ public class CaseViewer extends JLayeredPane {
     final private JCheckBoxMenuItem visSizeCheckbox = new JCheckBoxMenuItem(
             "ROI Size");
 
-    final private JCheckBoxMenuItem visShapeFactorCheckbox = new JCheckBoxMenuItem(
+    final private JCheckBoxMenuItem visCircularityCheckbox = new JCheckBoxMenuItem(
             "ROI Circularity");
 
-    final private JCheckBoxMenuItem visCircularityCheckbox = new JCheckBoxMenuItem(
+    final private JCheckBoxMenuItem visShapeFactorCheckbox = new JCheckBoxMenuItem(
             "Shape Factor");
 
     final private JSpinner visSizeMin = new JSpinner(new SpinnerNumberModel(
