@@ -61,22 +61,33 @@ public class CaseViewer extends JLayeredPane {
             }
         }
 
-        // preliminary search support
         @Override
         public void mouseClicked(MouseEvent e) {
-            if (e.getButton() == 1 && e.getClickCount() == 2) {
-                Component c = e.getComponent();
+            if (e.getButton() == 1) {
+                if (e.getClickCount() == 1) {
+                    // region
+                    Component c = e.getComponent();
 
-                if (c instanceof OneView) {
-                    OneView ov = (OneView) c;
-                    Truth t = ov.getTruth();
-                    if (t != null) {
-                        ROI r = t.getROI();
+                    if (c instanceof OneView) {
+                        OneView ov = (OneView) c;
+                        
+                        // TODO
+                    }
+                } else if (e.getClickCount() == 2) {
+                    // search
+                    Component c = e.getComponent();
 
-                        if (r != null) {
-                            // start a search
-                            startSearch(ov, r);
-                            return;
+                    if (c instanceof OneView) {
+                        OneView ov = (OneView) c;
+                        Truth t = ov.getTruth();
+                        if (t != null) {
+                            ROI r = t.getROI();
+
+                            if (r != null) {
+                                // start a search
+                                startSearch(ov, r);
+                                return;
+                            }
                         }
                     }
                 }

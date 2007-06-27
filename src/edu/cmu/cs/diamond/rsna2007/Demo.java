@@ -4,6 +4,7 @@ import java.awt.*;
 import java.awt.event.ActionEvent;
 import java.awt.event.ActionListener;
 import java.awt.image.BufferedImage;
+import java.awt.image.WritableRaster;
 import java.io.*;
 import java.util.ArrayList;
 import java.util.HashMap;
@@ -13,7 +14,10 @@ import java.util.regex.Matcher;
 import java.util.regex.Pattern;
 
 import javax.imageio.ImageIO;
-import javax.swing.*;
+import javax.swing.Box;
+import javax.swing.JButton;
+import javax.swing.JFrame;
+import javax.swing.JLabel;
 
 import edu.cmu.cs.diamond.opendiamond.Scope;
 import edu.cmu.cs.diamond.opendiamond.ScopeSource;
@@ -77,8 +81,7 @@ public class Demo extends JFrame {
             }
             System.exit(1);
         }
-        
-        
+
         GraphicsDevice gd = GraphicsEnvironment.getLocalGraphicsEnvironment()
                 .getDefaultScreenDevice();
 
@@ -123,10 +126,10 @@ public class Demo extends JFrame {
 
     private void setupWindow(File logoDir) {
         Banner banner = new Banner(logoDir);
-        
+
         add(banner, BorderLayout.NORTH);
         add(caseViewer);
-        
+
         Box h = Box.createHorizontalBox();
 
         prevButton.addActionListener(new ActionListener() {
@@ -242,8 +245,12 @@ public class Demo extends JFrame {
                 if (f.length > 0) {
                     String s = f[0].getAbsolutePath();
                     File roiPix = new File(s.substring(0, s.lastIndexOf(".")));
+
+                    System.out.println("reading ROI image as " + roiPix);
                     roi = new ROI(new FileInputStream(f[0]), ImageIO
                             .read(roiPix));
+                    // roi = new ROI(new FileInputStream(f[0]),
+                    // readMammogramImage(roiPix));
                 }
 
                 Truth t = null;
@@ -266,7 +273,17 @@ public class Demo extends JFrame {
                     // System.out.println(t);
                 }
 
-                BufferedImage img = ImageIO.read(new File(dir, line));
+                File imgFile = new File(dir, line);
+                System.out.println("reading case image as " + imgFile);
+                BufferedImage img = ImageIO.read(imgFile);
+
+                // BufferedImage img;
+                // try {
+                // img = readMammogramImage(imgFile);
+                // } catch (FileNotFoundException e) {
+                // img = new BufferedImage(100, 100,
+                // BufferedImage.TYPE_INT_RGB);
+                // }
                 CasePiece cp = new CasePiece(img, t);
 
                 String view = m.group(2).intern();
@@ -289,6 +306,50 @@ public class Demo extends JFrame {
                 lcc = lml = rcc = rml = null;
             }
         }
+    }
+
+    private BufferedImage readMammogramImage(File file) throws IOException {
+        // XXX path hack for now
+        File dir = new File(file.getParentFile(), "Images_ROI");
+        String f = file.getName();
+
+        String base = f.substring(0, f.lastIndexOf(".jpg")) + "_01.img";
+        File imgFile = new File(dir, base);
+
+        System.out.println("actually opening " + imgFile);
+        DataInputStream in = new DataInputStream(new FileInputStream(imgFile));
+
+        // skip to num_rows
+        in.skip(16 + 8 + 8 + 16 + 8 + 4);
+
+        // read h
+        byte buf[] = new byte[8];
+        in.readFully(buf);
+
+        String num = new String(buf);
+        int h = Integer.parseInt(num.replaceAll("\\D", " ").trim());
+
+        // read w
+        in.readFully(buf);
+        num = new String(buf);
+        int w = Integer.parseInt(num.replaceAll("\\D", " ").trim());
+
+        // skip to image
+        in.skip(12 + 4 + 8 + 8 + 4 + 16 + 32 + 16 + 2 + 16 + 16 + 16 + 16 + 8
+                + 6);
+
+        short data[] = new short[w * h];
+        for (int i = 0; i < w * h; i++) {
+            // read pixels
+            data[i] = (short) (65535 - (in.readShort() << 4));
+        }
+        BufferedImage img = new BufferedImage(w, h,
+                BufferedImage.TYPE_USHORT_GRAY);
+        WritableRaster wr = img.getRaster();
+        wr.setDataElements(0, 0, w, h, data);
+
+        System.out.println(img);
+        return img;
     }
 
     private MassMargin parseMargin(String s) {
