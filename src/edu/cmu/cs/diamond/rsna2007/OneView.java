@@ -145,4 +145,8 @@ public class OneView extends JPanel {
     public double getScale() {
         return scale;
     }
+
+    public String getImageFilename() {
+        return casePiece.getImageFilename();
+    }
 }

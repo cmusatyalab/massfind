@@ -163,10 +163,24 @@ public class ROI {
     final private List<Point2D> contour;
 
     final private double rawf[] = new double[50];
+
     final private double edmf[] = new double[38];
+
     final private double bdmf[] = new double[50];
 
     final private BufferedImage img;
+
+    public ROI(double data[], double contourX[], double contourY[],
+            BufferedImage img) {
+        if (data.length != rawf.length) {
+            throw new IllegalArgumentException("length of data given ("
+                    + data.length + ") != " + rawf.length);
+        }
+
+        System.arraycopy(data, 0, rawf, 0, rawf.length);
+        contour = makeContour(contourX, contourY);
+        this.img = img;
+    }
 
     public ROI(InputStream in, BufferedImage img) throws IOException {
         BufferedReader r = new BufferedReader(new InputStreamReader(in));

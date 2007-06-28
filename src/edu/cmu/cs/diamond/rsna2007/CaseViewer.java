@@ -6,10 +6,8 @@ import java.awt.Point;
 import java.awt.Toolkit;
 import java.awt.event.*;
 import java.awt.image.BufferedImage;
-import java.io.File;
-import java.io.FileInputStream;
-import java.io.FileNotFoundException;
-import java.io.IOException;
+import java.io.*;
+import java.util.StringTokenizer;
 
 import javax.swing.*;
 import javax.swing.event.ChangeEvent;
@@ -23,8 +21,6 @@ import edu.cmu.cs.diamond.opendiamond.Searchlet;
 
 public class CaseViewer extends JLayeredPane {
     private final static int SPACING = 10;
-
-    private Case theCase;
 
     final private OneView views[] = new OneView[4];
 
@@ -70,8 +66,10 @@ public class CaseViewer extends JLayeredPane {
 
                     if (c instanceof OneView) {
                         OneView ov = (OneView) c;
-                        
-                        // TODO
+                        Point ip = ov.getImagePoint(e.getPoint());
+                        // TODO use result
+                        ROI roi = getContour(ip, ov.getImageFilename());
+                        System.out.println(roi);
                     }
                 } else if (e.getClickCount() == 2) {
                     // search
@@ -118,6 +116,8 @@ public class CaseViewer extends JLayeredPane {
 
     protected SearchType searchType;
 
+    final private String regionFinderExe;
+
     final private JCheckBoxMenuItem visSizeCheckbox = new JCheckBoxMenuItem(
             "ROI Size");
 
@@ -145,10 +145,13 @@ public class CaseViewer extends JLayeredPane {
     final private JSpinner visShapeFactorMax = new JSpinner(
             new SpinnerNumberModel(1.0, 1.0, 10.0, 0.1));
 
-    public CaseViewer(File filterdir, Scope scope) {
+    public CaseViewer(File filterdir, File regionFinderExe, Scope scope)
+            throws IOException {
         super();
 
         this.scope = scope;
+
+        this.regionFinderExe = regionFinderExe.getCanonicalPath();
 
         setBackground(null);
 
@@ -174,6 +177,75 @@ public class CaseViewer extends JLayeredPane {
             o.addMouseMotionListener(mouseMotionListener);
             o.setComponentPopupMenu(popup);
             views[i] = o;
+        }
+    }
+
+    protected ROI getContour(Point ip, String imageFilename) {
+        File f = new File(imageFilename);
+        ProcessBuilder pb = new ProcessBuilder(regionFinderExe, f.getName(),
+                "-cx", Integer.toString(ip.x), "-cy", Integer.toString((ip.y)));
+        pb.directory(f.getParentFile());
+        try {
+            Process p = pb.start();
+            try {
+                p.waitFor();
+            } catch (InterruptedException e) {
+                e.printStackTrace();
+            }
+            return interpretContourResult(new File(imageFilename.substring(0,
+                    imageFilename.lastIndexOf(".img"))
+                    + ".txt"));
+        } catch (IOException e) {
+            e.printStackTrace();
+            return null;
+        }
+    }
+
+    private ROI interpretContourResult(File file) {
+        try {
+            BufferedReader r = new BufferedReader(new FileReader(file));
+            String line;
+
+            line = r.readLine();
+            if (line.startsWith(" ***")) {
+                // failed
+                return null;
+            }
+
+            // success
+
+            // read data
+            double data[] = new double[50];
+            int i = 0;
+            do {
+                StringTokenizer st = new StringTokenizer(line);
+                while (st.hasMoreTokens()) {
+                    data[i] = Double.parseDouble(st.nextToken());
+                    i++;
+                }
+                line = r.readLine();
+            } while (i < 50);
+
+            // read contour
+            int numContour = Integer.parseInt(line.trim());
+            double cx[] = new double[numContour];
+            double cy[] = new double[numContour];
+
+            for (i = 0; i < numContour; i++) {
+                // this will fail with NPE on early EOF
+                line = r.readLine();
+                StringTokenizer st = new StringTokenizer(line);
+                cx[i] = Double.parseDouble(st.nextToken());
+                cy[i] = Double.parseDouble(st.nextToken());
+            }
+
+            return new ROI(data, cx, cy, null);
+        } catch (FileNotFoundException e) {
+            e.printStackTrace();
+            return null;
+        } catch (IOException e) {
+            e.printStackTrace();
+            return null;
         }
     }
 
@@ -249,9 +321,7 @@ public class CaseViewer extends JLayeredPane {
         return mr;
     }
 
-    public void setCase(Case c) {
-        theCase = c;
-
+    public void setCase(Case theCase) {
         views[0].setView(theCase.getRightCC(), "RCC", theCase
                 .getMaximumHeight());
         views[1]

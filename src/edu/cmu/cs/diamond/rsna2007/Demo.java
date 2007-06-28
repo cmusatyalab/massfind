@@ -45,14 +45,15 @@ public class Demo extends JFrame {
     public static void main(String[] args) {
         Demo m;
 
-        if (args.length < 3) {
+        if (args.length < 4) {
             System.out.println("Usage: " + Demo.class.getName()
-                    + " index_file filter_dir scope_name");
+                    + " index_file filter_dir region_finder_path scope_name");
             System.exit(1);
         }
 
         File index = new File(args[0]);
         File filterdir = new File(args[1]);
+        File exe = new File(args[2]);
 
         // verify files
         if (!(index.canRead() && index.isFile())) {
@@ -66,7 +67,7 @@ public class Demo extends JFrame {
         }
 
         // verify scope
-        String scopeName = args[2];
+        String scopeName = args[3];
         List<Scope> scopes = ScopeSource.getPredefinedScopeList();
         Scope theScope = null;
         for (Scope scope : scopes) {
@@ -88,7 +89,7 @@ public class Demo extends JFrame {
                 .getDefaultScreenDevice();
 
         try {
-            m = new Demo(index, filterdir, theScope);
+            m = new Demo(index, filterdir, exe, theScope);
             m.setDefaultCloseOperation(JFrame.EXIT_ON_CLOSE);
             DisplayMode dm = gd.getDisplayMode();
 
@@ -107,10 +108,10 @@ public class Demo extends JFrame {
         }
     }
 
-    public Demo(File index, File filterdir, Scope scope) throws IOException {
+    public Demo(File index, File filterdir, File regionFinderExe, Scope scope) throws IOException {
         super("Diamond RSNA 2007");
 
-        caseViewer = new CaseViewer(filterdir, scope);
+        caseViewer = new CaseViewer(filterdir, regionFinderExe, scope);
 
         setMinimumSize(new Dimension(800, 600));
 
@@ -284,12 +285,13 @@ public class Demo extends JFrame {
                 // then, fall back to jpg
                 if (img == null) {
                     System.out.println(" falling back to jpeg");
-                    img = ImageIO.read(new File(dir, base + ".jpg"));
+                    imgFile = new File(dir, base + ".jpg");
+                    img = ImageIO.read(imgFile);
                 } else {
 
                 }
 
-                CasePiece cp = new CasePiece(img, t);
+                CasePiece cp = new CasePiece(img, t, imgFile.getCanonicalPath());
 
                 String view = m.group(2).intern();
                 if (view == "LCC") {
