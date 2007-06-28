@@ -49,6 +49,9 @@ public class OneView extends JPanel {
         setMinimumSize(new Dimension(w / 2, h / 2));
         setMaximumSize(new Dimension(w * 2, h * 2));
 
+        // force redraw of scaled image
+        oldW = oldH = 0;
+
         String toolTipText = null;
         Truth t = casePiece.getTruth();
         if (t != null) {
