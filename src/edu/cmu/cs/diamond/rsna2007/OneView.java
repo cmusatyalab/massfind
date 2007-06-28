@@ -100,16 +100,16 @@ public class OneView extends JPanel {
                         * scale, 1, 1));
             }
 
-//            Point2D c = roi.getCenter();
-//
-//            BufferedImage roiImg = roi.getImage();
-//            double rw = roiImg.getWidth();
-//            double rh = roiImg.getHeight();
-//            double x = c.getX() - rw / 2;
-//            double y = c.getY() - rh / 2;
-//
-//            g2.draw(new Rectangle2D.Double(scale * x, scale * y, scale * rh,
-//                    scale * rh));
+            // Point2D c = roi.getCenter();
+            //
+            // BufferedImage roiImg = roi.getImage();
+            // double rw = roiImg.getWidth();
+            // double rh = roiImg.getHeight();
+            // double x = c.getX() - rw / 2;
+            // double y = c.getY() - rh / 2;
+            //
+            // g2.draw(new Rectangle2D.Double(scale * x, scale * y, scale * rh,
+            // scale * rh));
         }
     }
 
