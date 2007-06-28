@@ -223,8 +223,14 @@ public class Demo extends JFrame {
                 final String exactName = (m.group(1) + m.group(2) + m.group(3))
                         .intern();
 
+                String parsedName = (m.group(1) + "xxx" + m.group(3)).intern();
                 if (name == null) {
-                    name = m.group(1) + "xxx" + m.group(3);
+                    name = parsedName;
+                } else {
+                    // compare
+                    if (name != parsedName) {
+                        throw new RuntimeException("Index file corrupt");
+                    }
                 }
 
                 // build truth
@@ -292,8 +298,6 @@ public class Demo extends JFrame {
                     g.setColor(new Color(0.0f, 0.0f, 1.0f, 0.2f));
                     g.fillRect(0, 0, img.getWidth(), img.getHeight());
                     g.dispose();
-                } else {
-
                 }
 
                 CasePiece cp = new CasePiece(img, t, imgFile.getCanonicalPath());
