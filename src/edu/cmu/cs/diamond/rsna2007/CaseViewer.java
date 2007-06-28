@@ -67,26 +67,11 @@ public class CaseViewer extends JLayeredPane {
                     if (c instanceof OneView) {
                         OneView ov = (OneView) c;
                         Point ip = ov.getImagePoint(e.getPoint());
-                        // TODO use result
+
                         ROI roi = getContour(ip, ov.getImageFilename());
-                        System.out.println(roi);
-                    }
-                } else if (e.getClickCount() == 2) {
-                    // search
-                    Component c = e.getComponent();
-
-                    if (c instanceof OneView) {
-                        OneView ov = (OneView) c;
-                        Truth t = ov.getTruth();
-                        if (t != null) {
-                            ROI r = t.getROI();
-
-                            if (r != null) {
-                                // start a search
-                                startSearch(ov, r);
-                                return;
-                            }
-                        }
+                        System.out.println(roi == null ? "no roi" : roi
+                                .getCenter());
+                        ov.setROI(roi);
                     }
                 }
             }
@@ -167,14 +152,11 @@ public class CaseViewer extends JLayeredPane {
 
         addMouseMotionListener(mouseMotionListener);
 
-        // popup
-        JPopupMenu popup = makePopup();
-        setComponentPopupMenu(popup);
-
         for (int i = 0; i < views.length; i++) {
             OneView o = new OneView();
             o.addMouseListener(mouseListener);
             o.addMouseMotionListener(mouseMotionListener);
+            JPopupMenu popup = makePopup(o);
             o.setComponentPopupMenu(popup);
             views[i] = o;
         }
@@ -220,7 +202,11 @@ public class CaseViewer extends JLayeredPane {
             do {
                 StringTokenizer st = new StringTokenizer(line);
                 while (st.hasMoreTokens()) {
-                    data[i] = Double.parseDouble(st.nextToken());
+                    try {
+                        data[i] = Double.parseDouble(st.nextToken());
+                    } catch (NumberFormatException e) {
+                        data[i] = Double.NaN;
+                    }
                     i++;
                 }
                 line = r.readLine();
@@ -241,7 +227,6 @@ public class CaseViewer extends JLayeredPane {
 
             return new ROI(data, cx, cy, null);
         } catch (FileNotFoundException e) {
-            e.printStackTrace();
             return null;
         } catch (IOException e) {
             e.printStackTrace();
@@ -249,9 +234,19 @@ public class CaseViewer extends JLayeredPane {
         }
     }
 
-    private JPopupMenu makePopup() {
+    private JPopupMenu makePopup(final OneView ov) {
         JPopupMenu popup = new JPopupMenu();
         JMenuItem m;
+
+        m = new JMenuItem("Search");
+        m.addActionListener(new ActionListener() {
+            public void actionPerformed(ActionEvent e) {
+                doSearch(ov);
+            }
+        });
+        popup.add(m);
+
+        popup.addSeparator();
 
         ButtonGroup searchGroup = new ButtonGroup();
         JRadioButtonMenuItem mr;
@@ -304,6 +299,17 @@ public class CaseViewer extends JLayeredPane {
         });
         popup.add(m);
         return popup;
+    }
+
+    public void doSearch(OneView ov) {
+        // search
+        ROI r = ov.getROI();
+
+        if (r != null) {
+            // start a search
+            startSearch(ov, r);
+            return;
+        }
     }
 
     private JRadioButtonMenuItem createTypeMenu(String text,

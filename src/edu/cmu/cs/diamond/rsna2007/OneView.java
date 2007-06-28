@@ -28,6 +28,8 @@ public class OneView extends JPanel {
 
     private String viewName;
 
+    private ROI roi;
+
     public OneView() {
         super();
 
@@ -49,14 +51,20 @@ public class OneView extends JPanel {
 
         String toolTipText = null;
         Truth t = casePiece.getTruth();
-        if (t != null && t.getBiopsy() == Truth.Biopsy.BIOPSY_MALIGNANT) {
-            toolTipText = "<html><table><tr><th>Age</th><td>" + t.getAge()
-                    + "</tr><tr><th>Shape</th><td>" + t.getShape()
-                    + "</td></tr><tr><th>Margin</th><td>" + t.getMargin()
-                    + "</td></tr><tr><th>BIRAD</th><td>" + t.getBirad()
-                    + "</td></tr><tr><th>Density</th><td>" + t.getDensity()
-                    + "</td></tr><tr><th>Subtlety</th><td>" + t.getSubtlety()
-                    + "</td></tr></table></html>";
+        if (t != null) {
+            if (t.getBiopsy() == Truth.Biopsy.BIOPSY_MALIGNANT) {
+                toolTipText = "<html><table><tr><th>Age</th><td>" + t.getAge()
+                        + "</tr><tr><th>Shape</th><td>" + t.getShape()
+                        + "</td></tr><tr><th>Margin</th><td>" + t.getMargin()
+                        + "</td></tr><tr><th>BIRAD</th><td>" + t.getBirad()
+                        + "</td></tr><tr><th>Density</th><td>" + t.getDensity()
+                        + "</td></tr><tr><th>Subtlety</th><td>"
+                        + t.getSubtlety() + "</td></tr></table></html>";
+            }
+
+            roi = t.getROI();
+        } else {
+            roi = null;
         }
         setToolTipText(toolTipText);
     }
@@ -78,31 +86,27 @@ public class OneView extends JPanel {
         // g.drawString(Double.toString(scale),
         // g.getFontMetrics().getMaxAscent() + 10, 20);
 
-        Truth t = casePiece.getTruth();
-        if (t != null) {
-            ROI r = t.getROI();
-            if (r != null) {
-                Graphics2D g2 = (Graphics2D) g;
-                g2.setColor(Color.RED);
+        if (roi != null) {
+            Graphics2D g2 = (Graphics2D) g;
+            g2.setColor(Color.RED);
 
-                g2.translate(drawPosX, drawPosY);
+            g2.translate(drawPosX, drawPosY);
 
-                for (Point2D p : r.getContour()) {
-                    g2.fill(new Rectangle2D.Double(p.getX() * scale, p.getY()
-                            * scale, 1, 1));
-                }
-
-                Point2D c = r.getCenter();
-
-                BufferedImage roi = r.getImage();
-                double rw = roi.getWidth();
-                double rh = roi.getHeight();
-                double x = c.getX() - rw / 2;
-                double y = c.getY() - rh / 2;
-
-                g2.draw(new Rectangle2D.Double(scale * x, scale * y,
-                        scale * rh, scale * rh));
+            for (Point2D p : roi.getContour()) {
+                g2.fill(new Rectangle2D.Double(p.getX() * scale, p.getY()
+                        * scale, 1, 1));
             }
+
+//            Point2D c = roi.getCenter();
+//
+//            BufferedImage roiImg = roi.getImage();
+//            double rw = roiImg.getWidth();
+//            double rh = roiImg.getHeight();
+//            double x = c.getX() - rw / 2;
+//            double y = c.getY() - rh / 2;
+//
+//            g2.draw(new Rectangle2D.Double(scale * x, scale * y, scale * rh,
+//                    scale * rh));
         }
     }
 
@@ -129,8 +133,8 @@ public class OneView extends JPanel {
         return casePiece.getImage();
     }
 
-    public Truth getTruth() {
-        return casePiece.getTruth();
+    public ROI getROI() {
+        return roi;
     }
 
     public Point getImagePoint(Point p) {
@@ -148,5 +152,10 @@ public class OneView extends JPanel {
 
     public String getImageFilename() {
         return casePiece.getImageFilename();
+    }
+
+    public void setROI(ROI roi) {
+        this.roi = roi;
+        repaint();
     }
 }
