@@ -19,6 +19,8 @@ import javax.swing.JButton;
 import javax.swing.JFrame;
 import javax.swing.JLabel;
 
+import org.jdesktop.swingx.graphics.GraphicsUtilities;
+
 import edu.cmu.cs.diamond.opendiamond.Scope;
 import edu.cmu.cs.diamond.opendiamond.ScopeSource;
 import edu.cmu.cs.diamond.rsna2007.Truth.Biopsy;
@@ -273,17 +275,20 @@ public class Demo extends JFrame {
                     // System.out.println(t);
                 }
 
-                File imgFile = new File(dir, line);
-                System.out.println("reading case image as " + imgFile);
-                BufferedImage img = ImageIO.read(imgFile);
+                // first try .img format
+                String base = line.substring(0, line.lastIndexOf(".jpg"));
+                File imgFile = new File(dir, base + ".img");
+                System.out.println("reading " + imgFile);
+                BufferedImage img = readMammogramImage(imgFile);
 
-                // BufferedImage img;
-                // try {
-                // img = readMammogramImage(imgFile);
-                // } catch (FileNotFoundException e) {
-                // img = new BufferedImage(100, 100,
-                // BufferedImage.TYPE_INT_RGB);
-                // }
+                // then, fall back to jpg
+                if (img == null) {
+                    System.out.println(" falling back to jpeg");
+                    img = ImageIO.read(new File(dir, base + ".jpg"));
+                } else {
+
+                }
+
                 CasePiece cp = new CasePiece(img, t);
 
                 String view = m.group(2).intern();
@@ -309,15 +314,13 @@ public class Demo extends JFrame {
     }
 
     private BufferedImage readMammogramImage(File file) throws IOException {
-        // XXX path hack for now
-        File dir = new File(file.getParentFile(), "Images_ROI");
-        String f = file.getName();
-
-        String base = f.substring(0, f.lastIndexOf(".jpg")) + "_01.img";
-        File imgFile = new File(dir, base);
-
-        System.out.println("actually opening " + imgFile);
-        DataInputStream in = new DataInputStream(new FileInputStream(imgFile));
+        DataInputStream in = null;
+        try {
+            in = new DataInputStream(new BufferedInputStream(
+                    new FileInputStream(file)));
+        } catch (FileNotFoundException e) {
+            return null;
+        }
 
         // skip to num_rows
         in.skip(16 + 8 + 8 + 16 + 8 + 4);
@@ -325,31 +328,35 @@ public class Demo extends JFrame {
         // read h
         byte buf[] = new byte[8];
         in.readFully(buf);
-
         String num = new String(buf);
-        int h = Integer.parseInt(num.replaceAll("\\D", " ").trim());
+        int h = Integer.parseInt(num.substring(0, num.indexOf('\0')));
 
         // read w
         in.readFully(buf);
         num = new String(buf);
-        int w = Integer.parseInt(num.replaceAll("\\D", " ").trim());
+        int w = Integer.parseInt(num.substring(0, num.indexOf('\0')));
 
         // skip to image
         in.skip(12 + 4 + 8 + 8 + 4 + 16 + 32 + 16 + 2 + 16 + 16 + 16 + 16 + 8
                 + 6);
 
         short data[] = new short[w * h];
+        System.out.println(" " + w + "x" + h);
         for (int i = 0; i < w * h; i++) {
             // read pixels
             data[i] = (short) (65535 - (in.readShort() << 4));
+            if (i % 10000 == 0) {
+                System.out.print(" " + (100 * i / (w * h)) + "  \r");
+                System.out.flush();
+            }
         }
+        System.out.println();
         BufferedImage img = new BufferedImage(w, h,
                 BufferedImage.TYPE_USHORT_GRAY);
         WritableRaster wr = img.getRaster();
         wr.setDataElements(0, 0, w, h, data);
 
-        System.out.println(img);
-        return img;
+        return GraphicsUtilities.toCompatibleImage(img);
     }
 
     private MassMargin parseMargin(String s) {
