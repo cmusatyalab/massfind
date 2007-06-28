@@ -108,7 +108,8 @@ public class Demo extends JFrame {
         }
     }
 
-    public Demo(File index, File filterdir, File regionFinderExe, Scope scope) throws IOException {
+    public Demo(File index, File filterdir, File regionFinderExe, Scope scope)
+            throws IOException {
         super("Diamond RSNA 2007");
 
         caseViewer = new CaseViewer(filterdir, regionFinderExe, scope);
@@ -286,7 +287,11 @@ public class Demo extends JFrame {
                 if (img == null) {
                     System.out.println(" falling back to jpeg");
                     imgFile = new File(dir, base + ".jpg");
-                    img = ImageIO.read(imgFile);
+                    img = GraphicsUtilities.toCompatibleImage(ImageIO.read(imgFile));
+                    Graphics2D g = img.createGraphics();
+                    g.setColor(new Color(0.0f, 0.0f, 1.0f, 0.2f));
+                    g.fillRect(0, 0, img.getWidth(), img.getHeight());
+                    g.dispose();
                 } else {
 
                 }
