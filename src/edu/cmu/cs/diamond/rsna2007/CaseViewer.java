@@ -184,11 +184,16 @@ public class CaseViewer extends JLayeredPane {
     }
 
     private ROI interpretContourResult(File file) {
+        BufferedReader r = null;
         try {
-            BufferedReader r = new BufferedReader(new FileReader(file));
+            r = new BufferedReader(new FileReader(file));
             String line;
 
             line = r.readLine();
+            if (line == null) {
+                return null;
+            }
+
             if (line.startsWith(" ***")) {
                 // failed
                 return null;
@@ -210,6 +215,9 @@ public class CaseViewer extends JLayeredPane {
                     i++;
                 }
                 line = r.readLine();
+                if (line == null) {
+                    return null;
+                }
             } while (i < 50);
 
             // read contour
@@ -220,6 +228,9 @@ public class CaseViewer extends JLayeredPane {
             for (i = 0; i < numContour; i++) {
                 // this will fail with NPE on early EOF
                 line = r.readLine();
+                if (line == null) {
+                    return null;
+                }
                 StringTokenizer st = new StringTokenizer(line);
                 cx[i] = Double.parseDouble(st.nextToken());
                 cy[i] = Double.parseDouble(st.nextToken());
