@@ -13,7 +13,7 @@ import edu.cmu.cs.diamond.opendiamond.Search;
 import edu.cmu.cs.diamond.opendiamond.SearchEvent;
 import edu.cmu.cs.diamond.opendiamond.SearchEventListener;
 
-public class SearchModel extends AbstractListModel implements
+final public class SearchModel extends AbstractListModel implements
         SearchEventListener {
     protected volatile boolean running;
 
