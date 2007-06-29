@@ -242,6 +242,13 @@ public class CaseViewer extends JLayeredPane {
         } catch (IOException e) {
             e.printStackTrace();
             return null;
+        } finally {
+            try {
+                if (r != null) {
+                    r.close();
+                }
+            } catch (IOException e) {
+            }
         }
     }
 
