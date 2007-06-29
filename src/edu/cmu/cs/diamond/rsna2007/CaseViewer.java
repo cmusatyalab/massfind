@@ -494,9 +494,8 @@ public class CaseViewer extends JLayeredPane {
                 functionName = "qaldm";
                 break;
             default:
-                filename = null;
-                data = null;
-                functionName = null;
+                throw new RuntimeException("searchType not valid: "
+                        + searchType);
             }
 
             File f = new File(filterdir, filename);
