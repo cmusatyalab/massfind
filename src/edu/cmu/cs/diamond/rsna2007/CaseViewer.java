@@ -338,8 +338,8 @@ public class CaseViewer extends JLayeredPane {
                 .setView(theCase.getLeftML(), "LML", theCase.getMaximumHeight());
 
         removeAll();
-        add(leftSearchResults, new Integer(10));
-        add(rightSearchResults, new Integer(10));
+        add(leftSearchResults, Integer.valueOf(10));
+        add(rightSearchResults, Integer.valueOf(10));
 
         leftSearchResults.setVisible(false);
         rightSearchResults.setVisible(false);
