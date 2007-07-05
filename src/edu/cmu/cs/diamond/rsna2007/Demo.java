@@ -186,141 +186,155 @@ public class Demo extends JFrame {
                 truthfile));
         Map<String, String[]> truth = new HashMap<String, String[]>();
 
-        Pattern tp = Pattern.compile("(\\S+\\.img\\s+.*)");
-        while ((line = truthReader.readLine()) != null) {
-            Matcher m = tp.matcher(line);
-            if (m.find()) {
-                // split
-                String splitLine[] = m.group(1).split("\\s+");
-                String key = (splitLine[0].substring(0, splitLine[0]
-                        .lastIndexOf(".img")).intern());
-                String value[] = new String[splitLine.length - 1];
-                System.arraycopy(splitLine, 1, value, 0, value.length);
-                assert (!truth.containsKey(key));
-                truth.put(key, value);
-            }
-        }
-        for (String key : truth.keySet()) {
-            System.out.print(key + " -> [");
-            for (String val : truth.get(key)) {
-                System.out.print(" " + val);
-            }
-            System.out.println(" ]");
-        }
-
-        System.out.println();
-        System.out.println("Reading index file: " + file);
-        BufferedReader reader = new BufferedReader(new FileReader(file));
-
-        CasePiece rml = null, lml = null, rcc = null, lcc = null;
-        String name = null;
-
-        Pattern p = Pattern.compile("(.*)(LCC|LML|RCC|RML)(.*)\\.jpg");
-
-        while ((line = reader.readLine()) != null) {
-            Matcher m = p.matcher(line);
-            if (m.matches()) {
-                final String exactName = (m.group(1) + m.group(2) + m.group(3))
-                        .intern();
-
-                String parsedName = (m.group(1) + "xxx" + m.group(3)).intern();
-                if (name == null) {
-                    name = parsedName;
-                } else {
-                    // compare
-                    if (name != parsedName) {
-                        throw new RuntimeException("Index file corrupt");
-                    }
+        try {
+            Pattern tp = Pattern.compile("(\\S+\\.img\\s+.*)");
+            while ((line = truthReader.readLine()) != null) {
+                Matcher m = tp.matcher(line);
+                if (m.find()) {
+                    // split
+                    String splitLine[] = m.group(1).split("\\s+");
+                    String key = (splitLine[0].substring(0, splitLine[0]
+                            .lastIndexOf(".img")).intern());
+                    String value[] = new String[splitLine.length - 1];
+                    System.arraycopy(splitLine, 1, value, 0, value.length);
+                    assert (!truth.containsKey(key));
+                    truth.put(key, value);
                 }
+            }
+            for (Map.Entry<String, String[]> e : truth.entrySet()) {
+                System.out.print(e.getKey() + " -> [");
+                for (String val : e.getValue()) {
+                    System.out.print(" " + val);
+                }
+                System.out.println(" ]");
+            }
 
-                // build truth
-                String ti[] = truth.get(exactName);
+            System.out.println();
+            System.out.println("Reading index file: " + file);
+            BufferedReader reader = new BufferedReader(new FileReader(file));
 
-                ROI roi = null;
-                // try to load ROI file
-                File f[] = dir.listFiles(new FileFilter() {
+            CasePiece rml = null, lml = null, rcc = null, lcc = null;
+            String name = null;
 
-                    public boolean accept(File pathname) {
-                        String name = pathname.getName();
+            Pattern p = Pattern.compile("(.*)(LCC|LML|RCC|RML)(.*)\\.jpg");
 
-                        boolean result = name.contains(exactName)
-                                && name.endsWith(".text_attr");
-                        if (result) {
-                            System.out.println(" *** matched " + name);
+            try {
+                while ((line = reader.readLine()) != null) {
+                    Matcher m = p.matcher(line);
+                    if (m.matches()) {
+                        final String exactName = (m.group(1) + m.group(2) + m
+                                .group(3)).intern();
+
+                        String parsedName = (m.group(1) + "xxx" + m.group(3))
+                                .intern();
+                        if (name == null) {
+                            name = parsedName;
+                        } else {
+                            // compare
+                            if (name != parsedName) {
+                                throw new RuntimeException("Index file corrupt");
+                            }
                         }
-                        return result;
+
+                        // build truth
+                        String ti[] = truth.get(exactName);
+
+                        ROI roi = null;
+                        // try to load ROI file
+                        File f[] = dir.listFiles(new FileFilter() {
+
+                            public boolean accept(File pathname) {
+                                String name = pathname.getName();
+
+                                boolean result = name.contains(exactName)
+                                        && name.endsWith(".text_attr");
+                                if (result) {
+                                    System.out.println(" *** matched " + name);
+                                }
+                                return result;
+                            }
+
+                        });
+                        if (f.length > 0) {
+                            String s = f[0].getAbsolutePath();
+                            File roiPix = new File(s.substring(0, s
+                                    .lastIndexOf(".")));
+
+                            System.out
+                                    .println("reading ROI image as " + roiPix);
+                            roi = new ROI(new FileInputStream(f[0]), ImageIO
+                                    .read(roiPix));
+                            // roi = new ROI(new FileInputStream(f[0]),
+                            // readMammogramImage(roiPix));
+                        }
+
+                        Truth t = null;
+                        if (ti != null) {
+                            int birad = Integer.parseInt(ti[2]);
+                            int subtlety = Integer.parseInt(ti[3]);
+                            int density = Integer.parseInt(ti[4]);
+                            int age = -1;
+                            Truth.Biopsy biopsy = parseBiopsy(ti[6]);
+                            Truth.MassShape shape = null;
+                            Truth.MassMargin margin = null;
+                            if (biopsy == Biopsy.BIOPSY_MALIGNANT) {
+                                age = Integer.parseInt(ti[5]);
+                                shape = parseShape(ti[7]);
+                                margin = parseMargin(ti[8]);
+                            }
+
+                            t = new Truth(birad, subtlety, density, age,
+                                    biopsy, shape, margin, roi);
+                            // System.out.println(t);
+                        }
+
+                        // first try .img format
+                        String base = line.substring(0, line
+                                .lastIndexOf(".jpg"));
+                        File imgFile = new File(dir, base + ".img");
+                        System.out.println("reading " + imgFile);
+                        BufferedImage img = readMammogramImage(imgFile);
+
+                        // then, fall back to jpg
+                        if (img == null) {
+                            System.out.println(" falling back to jpeg");
+                            imgFile = new File(dir, base + ".jpg");
+                            img = GraphicsUtilities.toCompatibleImage(ImageIO
+                                    .read(imgFile));
+                            Graphics2D g = img.createGraphics();
+                            g.setColor(new Color(0.0f, 0.0f, 1.0f, 0.2f));
+                            g.fillRect(0, 0, img.getWidth(), img.getHeight());
+                            g.dispose();
+                        }
+
+                        CasePiece cp = new CasePiece(img, t, imgFile
+                                .getCanonicalPath());
+
+                        String view = m.group(2).intern();
+                        if (view == "LCC") {
+                            lcc = cp;
+                        } else if (view == "LML") {
+                            lml = cp;
+                        } else if (view == "RCC") {
+                            rcc = cp;
+                        } else if (view == "RML") {
+                            rml = cp;
+                        }
                     }
 
-                });
-                if (f.length > 0) {
-                    String s = f[0].getAbsolutePath();
-                    File roiPix = new File(s.substring(0, s.lastIndexOf(".")));
-
-                    System.out.println("reading ROI image as " + roiPix);
-                    roi = new ROI(new FileInputStream(f[0]), ImageIO
-                            .read(roiPix));
-                    // roi = new ROI(new FileInputStream(f[0]),
-                    // readMammogramImage(roiPix));
-                }
-
-                Truth t = null;
-                if (ti != null) {
-                    int birad = Integer.parseInt(ti[2]);
-                    int subtlety = Integer.parseInt(ti[3]);
-                    int density = Integer.parseInt(ti[4]);
-                    int age = -1;
-                    Truth.Biopsy biopsy = parseBiopsy(ti[6]);
-                    Truth.MassShape shape = null;
-                    Truth.MassMargin margin = null;
-                    if (biopsy == Biopsy.BIOPSY_MALIGNANT) {
-                        age = Integer.parseInt(ti[5]);
-                        shape = parseShape(ti[7]);
-                        margin = parseMargin(ti[8]);
+                    if (name != null && lcc != null && lml != null
+                            && rcc != null && rml != null) {
+                        System.out.println("Adding case " + name);
+                        cases.add(new Case(rcc, lcc, rml, lml, name));
+                        name = null;
+                        lcc = lml = rcc = rml = null;
                     }
-
-                    t = new Truth(birad, subtlety, density, age, biopsy, shape,
-                            margin, roi);
-                    // System.out.println(t);
                 }
-
-                // first try .img format
-                String base = line.substring(0, line.lastIndexOf(".jpg"));
-                File imgFile = new File(dir, base + ".img");
-                System.out.println("reading " + imgFile);
-                BufferedImage img = readMammogramImage(imgFile);
-
-                // then, fall back to jpg
-                if (img == null) {
-                    System.out.println(" falling back to jpeg");
-                    imgFile = new File(dir, base + ".jpg");
-                    img = GraphicsUtilities.toCompatibleImage(ImageIO.read(imgFile));
-                    Graphics2D g = img.createGraphics();
-                    g.setColor(new Color(0.0f, 0.0f, 1.0f, 0.2f));
-                    g.fillRect(0, 0, img.getWidth(), img.getHeight());
-                    g.dispose();
-                }
-
-                CasePiece cp = new CasePiece(img, t, imgFile.getCanonicalPath());
-
-                String view = m.group(2).intern();
-                if (view == "LCC") {
-                    lcc = cp;
-                } else if (view == "LML") {
-                    lml = cp;
-                } else if (view == "RCC") {
-                    rcc = cp;
-                } else if (view == "RML") {
-                    rml = cp;
-                }
+            } finally {
+                reader.close();
             }
-
-            if (name != null && lcc != null && lml != null && rcc != null
-                    && rml != null) {
-                System.out.println("Adding case " + name);
-                cases.add(new Case(rcc, lcc, rml, lml, name));
-                name = null;
-                lcc = lml = rcc = rml = null;
-            }
+        } finally {
+            truthReader.close();
         }
     }
 
@@ -333,41 +347,45 @@ public class Demo extends JFrame {
             return null;
         }
 
-        // skip to num_rows
-        in.skip(16 + 8 + 8 + 16 + 8 + 4);
+        try {
+            // skip to num_rows
+            in.readFully(new byte[16 + 8 + 8 + 16 + 8 + 4]);
 
-        // read h
-        byte buf[] = new byte[8];
-        in.readFully(buf);
-        String num = new String(buf);
-        int h = Integer.parseInt(num.substring(0, num.indexOf('\0')));
+            // read h
+            byte buf[] = new byte[8];
+            in.readFully(buf);
+            String num = new String(buf);
+            int h = Integer.parseInt(num.substring(0, num.indexOf('\0')));
 
-        // read w
-        in.readFully(buf);
-        num = new String(buf);
-        int w = Integer.parseInt(num.substring(0, num.indexOf('\0')));
+            // read w
+            in.readFully(buf);
+            num = new String(buf);
+            int w = Integer.parseInt(num.substring(0, num.indexOf('\0')));
 
-        // skip to image
-        in.skip(12 + 4 + 8 + 8 + 4 + 16 + 32 + 16 + 2 + 16 + 16 + 16 + 16 + 8
-                + 6);
+            // skip to image
+            in.readFully(new byte[12 + 4 + 8 + 8 + 4 + 16 + 32 + 16 + 2 + 16
+                    + 16 + 16 + 16 + 8 + 6]);
 
-        short data[] = new short[w * h];
-        System.out.println(" " + w + "x" + h);
-        for (int i = 0; i < w * h; i++) {
-            // read pixels
-            data[i] = (short) (65535 - (in.readShort() << 4));
-            if (i % 10000 == 0) {
-                System.out.print(" " + (100 * i / (w * h)) + "  \r");
-                System.out.flush();
+            short data[] = new short[w * h];
+            System.out.println(" " + w + "x" + h);
+            for (int i = 0; i < w * h; i++) {
+                // read pixels
+                data[i] = (short) (65535 - (in.readShort() << 4));
+                if (i % 10000 == 0) {
+                    System.out.print(" " + (100 * i / (w * h)) + "  \r");
+                    System.out.flush();
+                }
             }
-        }
-        System.out.println();
-        BufferedImage img = new BufferedImage(w, h,
-                BufferedImage.TYPE_USHORT_GRAY);
-        WritableRaster wr = img.getRaster();
-        wr.setDataElements(0, 0, w, h, data);
+            System.out.println();
+            BufferedImage img = new BufferedImage(w, h,
+                    BufferedImage.TYPE_USHORT_GRAY);
+            WritableRaster wr = img.getRaster();
+            wr.setDataElements(0, 0, w, h, data);
 
-        return GraphicsUtilities.toCompatibleImage(img);
+            return GraphicsUtilities.toCompatibleImage(img);
+        } finally {
+            in.close();
+        }
     }
 
     private MassMargin parseMargin(String s) {
