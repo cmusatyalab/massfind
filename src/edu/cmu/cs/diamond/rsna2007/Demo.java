@@ -28,6 +28,14 @@ import edu.cmu.cs.diamond.rsna2007.Truth.MassMargin;
 import edu.cmu.cs.diamond.rsna2007.Truth.MassShape;
 
 public class Demo extends JFrame {
+    private static final String SCOPE_NAME_TXT = "scope_name";
+
+    private static final String REGION_FINDER_PATH_TXT = "region_finder_path";
+
+    private static final String FILTER_DIR_TXT = "filter_dir";
+
+    private static final String INDEX_FILE_TXT = "index_file";
+
     final static private boolean FULL_SCREEN = true;
 
     final private CaseViewer caseViewer;
@@ -46,8 +54,9 @@ public class Demo extends JFrame {
         Demo m;
 
         if (args.length < 4) {
-            System.out.println("Usage: " + Demo.class.getName()
-                    + " index_file filter_dir region_finder_path scope_name");
+            System.out.println("Usage: " + Demo.class.getName() + " "
+                    + INDEX_FILE_TXT + " " + FILTER_DIR_TXT + " "
+                    + REGION_FINDER_PATH_TXT + " " + SCOPE_NAME_TXT);
             System.exit(1);
         }
 
@@ -57,12 +66,19 @@ public class Demo extends JFrame {
 
         // verify files
         if (!(index.canRead() && index.isFile())) {
-            System.out.println("error: index_file must be readable file");
+            System.out.println("error: " + INDEX_FILE_TXT
+                    + " must be readable file");
             System.exit(1);
         }
 
         if (!(filterdir.canRead() && filterdir.isDirectory())) {
-            System.out.println("error: filter_dir must be readable directory");
+            System.out.println("error: " + FILTER_DIR_TXT + " must be readable directory");
+            System.exit(1);
+        }
+
+        if (!(exe.canRead() && exe.isFile())) {
+            System.out
+                    .println("error: " + REGION_FINDER_PATH_TXT + " must be executable file");
             System.exit(1);
         }
 
@@ -77,7 +93,7 @@ public class Demo extends JFrame {
             }
         }
         if (theScope == null) {
-            System.out.println("scope_name \"" + scopeName + "\" not found");
+            System.out.println(SCOPE_NAME_TXT + " \"" + scopeName + "\" not found");
             System.out.println("Available scopes:");
             for (Scope scope : scopes) {
                 System.out.println(" " + scope.getName());
