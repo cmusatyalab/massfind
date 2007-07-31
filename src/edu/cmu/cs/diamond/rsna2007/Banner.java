@@ -8,13 +8,7 @@ import java.io.IOException;
 import java.util.Arrays;
 
 import javax.imageio.ImageIO;
-import javax.swing.BorderFactory;
-import javax.swing.Box;
-import javax.swing.JComponent;
-import javax.swing.JLabel;
-import javax.swing.JPanel;
-
-import org.jdesktop.swingx.graphics.GraphicsUtilities;
+import javax.swing.*;
 
 import edu.cmu.cs.diamond.opendiamond.Util;
 

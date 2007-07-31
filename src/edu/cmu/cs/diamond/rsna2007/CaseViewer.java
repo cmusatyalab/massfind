@@ -1,9 +1,6 @@
 package edu.cmu.cs.diamond.rsna2007;
 
-import java.awt.Component;
-import java.awt.Cursor;
-import java.awt.Point;
-import java.awt.Toolkit;
+import java.awt.*;
 import java.awt.event.*;
 import java.awt.image.BufferedImage;
 import java.io.*;
@@ -13,11 +10,7 @@ import javax.swing.*;
 import javax.swing.event.ChangeEvent;
 import javax.swing.event.ChangeListener;
 
-import edu.cmu.cs.diamond.opendiamond.Filter;
-import edu.cmu.cs.diamond.opendiamond.FilterCode;
-import edu.cmu.cs.diamond.opendiamond.Scope;
-import edu.cmu.cs.diamond.opendiamond.Search;
-import edu.cmu.cs.diamond.opendiamond.Searchlet;
+import edu.cmu.cs.diamond.opendiamond.*;
 
 public class CaseViewer extends JLayeredPane {
     private final static int SPACING = 10;
