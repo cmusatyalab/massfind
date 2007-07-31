@@ -5,7 +5,7 @@ import java.awt.*;
 import javax.swing.*;
 
 public class MagnifierWindow extends JWindow {
-    private static final int MAGNIFIER_SIZE = 512;
+    private final int magnifierSize;
 
     protected class Magnifier extends JComponent {
         final private Font font = Font.decode(null);
@@ -13,7 +13,7 @@ public class MagnifierWindow extends JWindow {
         final static private int BORDER_SIZE = 4;
 
         public Magnifier() {
-            Dimension d = new Dimension(MAGNIFIER_SIZE, MAGNIFIER_SIZE);
+            Dimension d = new Dimension(magnifierSize, magnifierSize);
             setMinimumSize(d);
             setPreferredSize(d);
             setMaximumSize(d);
@@ -89,12 +89,13 @@ public class MagnifierWindow extends JWindow {
 
     final private Magnifier mag;
 
-    public MagnifierWindow(CaseViewer viewer) {
+    public MagnifierWindow(CaseViewer viewer, int magnifierSize) {
         super();
         setBackground(Color.BLACK);
         getContentPane().setBackground(null);
         setCursor(CaseViewer.hiddenCursor);
         this.viewer = viewer;
+        this.magnifierSize = magnifierSize;
 
         box = Box.createHorizontalBox();
 
@@ -126,7 +127,7 @@ public class MagnifierWindow extends JWindow {
     }
 
     public void setMagnifyPoint(int x, int y) {
-        setLocation(x - mag.getX() - MAGNIFIER_SIZE / 2, y - mag.getY()
-                - MAGNIFIER_SIZE / 2);
+        setLocation(x - mag.getX() - magnifierSize / 2, y - mag.getY()
+                - magnifierSize / 2);
     }
 }
