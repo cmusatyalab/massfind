@@ -78,7 +78,7 @@ public class Banner extends JPanel {
             final int sW = (int) (w * scale);
             final int sH = (int) (h * scale);
 
-            scaledImg = GraphicsUtilities.createThumbnail(tmp, sW, sH);
+            scaledImg = Util.scaleImage(tmp, scale);
 
             // center in X,Y
             drawPosX = (cW - sW) / 2 + in.left;
