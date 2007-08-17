@@ -61,10 +61,20 @@ public class CaseViewer extends JLayeredPane {
                         OneView ov = (OneView) c;
                         Point ip = ov.getImagePoint(e.getPoint());
 
-                        ROI roi = getContour(ip, ov.getImageFilename());
-                        System.out.println(roi == null ? "no roi" : roi
-                                .getCenter());
-                        ov.setROI(roi);
+                        // set busy cursor
+                        Cursor oldCursor = getCursor();
+
+                        try {
+                            setCursor(Cursor
+                                    .getPredefinedCursor(Cursor.WAIT_CURSOR));
+                            ROI roi = getContour(ip, ov.getImageFilename());
+
+                            System.out.println(roi == null ? "no roi" : roi
+                                    .getCenter());
+                            ov.setROI(roi);
+                        } finally {
+                            setCursor(oldCursor);
+                        }
                     }
                 }
             }
