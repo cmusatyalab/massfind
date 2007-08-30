@@ -111,7 +111,6 @@ public class Demo extends JFrame {
 
             if (FULL_SCREEN) {
                 m.setUndecorated(true);
-                m.setResizable(false);
                 m.setBounds(0, 0, dm.getWidth(), dm.getHeight());
             } else {
                 m.setSize(m.getMinimumSize());
