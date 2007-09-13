@@ -170,14 +170,20 @@ public class ROI {
 
     final private BufferedImage img;
 
-    public ROI(double data[], double contourX[], double contourY[],
+    public ROI(double data[], double contourX[], double contourY[], double norm[],
             BufferedImage img) {
         if (data.length != rawf.length) {
             throw new IllegalArgumentException("length of data given ("
                     + data.length + ") != " + rawf.length);
         }
+        
+        if (norm.length != edmf.length) {
+            throw new IllegalArgumentException("length of norm given ("
+                    + norm.length + ") != " + edmf.length);       
+        }
 
         System.arraycopy(data, 0, rawf, 0, rawf.length);
+        System.arraycopy(norm, 0, edmf, 0, edmf.length);
         contour = makeContour(contourX, contourY);
         this.img = img;
     }

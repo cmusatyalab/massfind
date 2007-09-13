@@ -248,8 +248,31 @@ public class CaseViewer extends JLayeredPane {
                 cx[i] = Double.parseDouble(st.nextToken());
                 cy[i] = Double.parseDouble(st.nextToken());
             }
+            
+            // XXXX
+            
+            double normdata[] = new double[38];
+            i = 0;
+            line = r.readLine();
+            do {
+                if (line == null) {
+                    return null;
+                }
+               StringTokenizer st = new StringTokenizer(line);
+                while (st.hasMoreTokens()) {
+                    try {
+                        normdata[i] = Double.parseDouble(st.nextToken());
+                    } catch (NumberFormatException e) {
+                        normdata[i] = Double.NaN;
+                    }
+                    i++;
+                }
+                 line = r.readLine();
+            } while (i < normdata.length-2);
+            normdata[37] = 1;
 
-            return new ROI(data, cx, cy, null);
+
+            return new ROI(data, cx, cy, normdata, null);
         } catch (FileNotFoundException e) {
             return null;
         } catch (IOException e) {
