@@ -28,8 +28,6 @@ import edu.cmu.cs.diamond.rsna2007.Truth.MassMargin;
 import edu.cmu.cs.diamond.rsna2007.Truth.MassShape;
 
 public class Demo extends JFrame {
-    private static final String SCOPE_NAME_TXT = "scope_name";
-
     private static final String REGION_FINDER_PATH_TXT = "region_finder_path";
 
     private static final String FILTER_DIR_TXT = "filter_dir";
@@ -53,10 +51,10 @@ public class Demo extends JFrame {
     public static void main(String[] args) {
         Demo m;
 
-        if (args.length < 4) {
+        if (args.length < 3) {
             System.out.println("Usage: " + Demo.class.getName() + " "
                     + INDEX_FILE_TXT + " " + FILTER_DIR_TXT + " "
-                    + REGION_FINDER_PATH_TXT + " " + SCOPE_NAME_TXT);
+                    + REGION_FINDER_PATH_TXT);
             System.exit(1);
         }
 
@@ -82,24 +80,10 @@ public class Demo extends JFrame {
             System.exit(1);
         }
 
-        // verify scope
-        String scopeName = args[3];
+        // load scope
+        ScopeSource.commitScope();
         List<Scope> scopes = ScopeSource.getPredefinedScopeList();
-        Scope theScope = null;
-        for (Scope scope : scopes) {
-            if (scope.getName().equals(scopeName)) {
-                theScope = scope;
-                break;
-            }
-        }
-        if (theScope == null) {
-            System.out.println(SCOPE_NAME_TXT + " \"" + scopeName + "\" not found");
-            System.out.println("Available scopes:");
-            for (Scope scope : scopes) {
-                System.out.println(" " + scope.getName());
-            }
-            System.exit(1);
-        }
+        Scope theScope = scopes.get(0);
 
         GraphicsDevice gd = GraphicsEnvironment.getLocalGraphicsEnvironment()
                 .getDefaultScreenDevice();
