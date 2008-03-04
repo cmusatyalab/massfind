@@ -99,21 +99,27 @@ public class CaseViewer extends JLayeredPane {
     private int magX;
 
     final private Scope scope;
-
-    final protected JSlider thresholdSlider = new JSlider(0, 100, 60);
+    
+    final private static int SEARCH_THRESHOLD_DEFAULT = 85;
+    
+    final private static int SEARCH_THRESHOLD_MIN = 0;
+    
+    final private static int SEARCH_THRESHOLD_MAX = 100;
+    
+    private int searchThreshold = SEARCH_THRESHOLD_DEFAULT;
 
     protected SearchType searchType;
 
     final private String regionFinderExe;
-
+    
     final private JCheckBoxMenuItem visSizeCheckbox = new JCheckBoxMenuItem(
-            "ROI Size");
-
+    		"ROI Size");
+ 
     final private JCheckBoxMenuItem visCircularityCheckbox = new JCheckBoxMenuItem(
             "ROI Circularity");
 
     final private JCheckBoxMenuItem visShapeFactorCheckbox = new JCheckBoxMenuItem(
-            "Shape Factor");
+            "Shape Factor Ratio");
 
     final private JSpinner visSizeMin = new JSpinner(new SpinnerNumberModel(
             1.0, 0.0, 1.0, 0.1));
@@ -307,41 +313,54 @@ public class CaseViewer extends JLayeredPane {
         JMenu subpop = new JMenu("Distance Metric");
         mr = createTypeMenu("Euclidian", SearchType.SEARCH_TYPE_EUCLIDIAN,
                 searchGroup);
-        mr.setSelected(true);
+        // mr.setSelected(true);
         subpop.add(mr);
 
         mr = createTypeMenu("Boosted Learned",
                 SearchType.SEARCH_TYPE_BOOSTED_LEARNED, searchGroup);
+        mr.setSelected(true);
         subpop.add(mr);
-
-        mr = createTypeMenu("Query Adaptive Learned",
-                SearchType.SEARCH_TYPE_QUERY_ADAPTIVE_LEARNED, searchGroup);
-        subpop.add(mr);
+        
+        // not implemented yet
+//        mr = createTypeMenu("Query Adaptive Learned",
+//                SearchType.SEARCH_TYPE_QUERY_ADAPTIVE_LEARNED, searchGroup);
+//        subpop.add(mr);
 
         popup.add(subpop);
 
         subpop = new JMenu("Search Threshold");
+        JSlider thresholdSlider = new JSlider(JSlider.HORIZONTAL, 
+        		SEARCH_THRESHOLD_MIN, SEARCH_THRESHOLD_MAX,
+        		SEARCH_THRESHOLD_DEFAULT);
         thresholdSlider.setMajorTickSpacing(20);
         thresholdSlider.setMinorTickSpacing(5);
         thresholdSlider.setPaintTicks(true);
         thresholdSlider.setPaintLabels(true);
+        
+        thresholdSlider.addChangeListener(new ChangeListener() {
+        		public void stateChanged(ChangeEvent e) {
+        			JSlider source = (JSlider)e.getSource();
+        			searchThreshold = source.getValue();
+                }
+        	});
+        
         subpop.add(thresholdSlider);
         popup.add(subpop);
-
-        subpop = new JMenu("Visual Constraints");
-        subpop.add(visSizeCheckbox);
-        subpop.add(visSizeMin);
-        subpop.add(visSizeMax);
-        subpop.addSeparator();
-        subpop.add(visCircularityCheckbox);
-        subpop.add(visCircularityMin);
-        subpop.add(visCircularityMax);
-        subpop.addSeparator();
-        subpop.add(visShapeFactorCheckbox);
-        subpop.add(visShapeFactorMin);
-        subpop.add(visShapeFactorMax);
-
-        popup.add(subpop);
+        
+        // leave these out for now - spinners don't work
+//        subpop = new JMenu("Visual Constraints");
+//        subpop.add(visSizeCheckbox);
+//        subpop.add(visSizeMin);
+//        subpop.add(visSizeMax);
+//        subpop.addSeparator();
+//        subpop.add(visCircularityCheckbox);
+//        subpop.add(visCircularityMin);
+//        subpop.add(visCircularityMax);
+//        subpop.addSeparator();
+//        subpop.add(visShapeFactorCheckbox);
+//        subpop.add(visShapeFactorMin);
+//        subpop.add(visShapeFactorMax);
+//        popup.add(subpop);
 
         popup.addSeparator();
 
@@ -379,6 +398,10 @@ public class CaseViewer extends JLayeredPane {
         });
         searchGroup.add(mr);
         return mr;
+    }
+    
+    private void addCheckBoxMenuItem(JMenu menu, String name, boolean selected) {
+ 
     }
 
     public void setCase(Case theCase) {
@@ -543,7 +566,7 @@ public class CaseViewer extends JLayeredPane {
             FilterCode fc = new FilterCode(new FileInputStream(f));
             Filter ff = new Filter("filter", fc, "f_eval_" + functionName,
                     "f_init_" + functionName, "f_fini_" + functionName,
-                    thresholdSlider.getValue(), new String[] {}, args, 1);
+                    searchThreshold, new String[] {}, args, 1);
             s.addFilter(ff);
 
             if (visSizeCheckbox.isSelected()
