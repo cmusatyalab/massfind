@@ -3,21 +3,23 @@ package edu.cmu.cs.diamond.massfind2;
 import java.awt.geom.Point2D;
 import java.awt.image.BufferedImage;
 import java.io.BufferedReader;
-import java.io.FileReader;
 import java.io.IOException;
 import java.io.InputStream;
 import java.io.InputStreamReader;
 import java.util.ArrayList;
+import java.util.Arrays;
 import java.util.List;
 import java.util.StringTokenizer;
 import java.util.regex.Matcher;
 import java.util.regex.Pattern;
 
 public class ROI {
-	final static public int NUM_RAW_FEATURES = 50;
-	final static public int NUM_UPMC_FEATURES = 38;
-	final static public int NUM_BOOSTLDM_FEATURES = 216;
-	
+    final static public int NUM_RAW_FEATURES = 50;
+
+    final static public int NUM_UPMC_FEATURES = 38;
+
+    final static public int NUM_BOOSTLDM_FEATURES = 216;
+
     // average pixel value of whole breast area
     final static public int UPMC_AVG_PIXEL_VALUE = 0;
 
@@ -173,102 +175,109 @@ public class ROI {
     final private double edmf[] = new double[NUM_UPMC_FEATURES];
 
     final private double bdmf[] = new double[NUM_BOOSTLDM_FEATURES];
-    
+
     private static final String FEATURE_AVG_DAT = "u_vector.dat";
-    
+
     private static final String TRANSFORM_DAT = "w_matrix.dat";
-    
-	static private double u_vector[];
-	
-	static private double w_matrix[][];
-    
+
+    static private double u_vector[];
+
+    static private double w_matrix[][];
+
     final private BufferedImage img;
 
-    public ROI(double data[], double contourX[], double contourY[], double norm[],
-            BufferedImage img) throws IOException {
+    public ROI(double data[], double contourX[], double contourY[],
+            double norm[], BufferedImage img) throws IOException {
         if (data.length != rawf.length) {
             throw new IllegalArgumentException("length of data given ("
                     + data.length + ") != " + rawf.length);
         }
-        
+
         if (norm.length != edmf.length) {
             throw new IllegalArgumentException("length of norm given ("
-                    + norm.length + ") != " + edmf.length);       
+                    + norm.length + ") != " + edmf.length);
         }
 
         System.arraycopy(data, 0, rawf, 0, rawf.length);
         System.arraycopy(norm, 0, edmf, 0, edmf.length);
         contour = makeContour(contourX, contourY);
-        
+
         // calculate boosted LDM features
         if (u_vector == null) {
-        	u_vector = readFeatureAverages();
+            u_vector = readFeatureAverages();
         }
         if (w_matrix == null) {
-        	w_matrix = readTransform();
+            w_matrix = readTransform();
         }
         computeBDMFeatures();
-        
+
         this.img = img;
     }
-    
+
     private double[] readFeatureAverages() throws IOException {
         double result[] = new double[NUM_UPMC_FEATURES];
-        
-       	BufferedReader in = new BufferedReader(new FileReader(FEATURE_AVG_DAT));
-    	for (int i = 0; i < NUM_UPMC_FEATURES; i++) {
-    		String str = in.readLine();
-    		StringTokenizer t = new StringTokenizer(str);
-    		Double val = new Double(t.nextToken());
-    		result[i] = val.doubleValue();
-     	}
-    	in.close();
-  
-    	return result;
-    }
-    
-    private double[][] readTransform() throws IOException {
-    	// one extra row for thresholds
-    	double result[][] = new double[NUM_UPMC_FEATURES+1][NUM_BOOSTLDM_FEATURES];
 
-    	BufferedReader in = new BufferedReader(new FileReader(TRANSFORM_DAT));
-    	for (int i = 0; i < NUM_UPMC_FEATURES+1; i++) {
-       		String str = in.readLine();
-  	    	StringTokenizer t = new StringTokenizer(str);
-       	    for (int j = 0; j < NUM_BOOSTLDM_FEATURES; j++) {
-       	   		Double val = new Double(t.nextToken());
-        		result[i][j] = val.doubleValue();       	    
-       	    }
-    	}
-		in.close();
-		
-		return result;
+        BufferedReader in = new BufferedReader(
+                new InputStreamReader(this.getClass().getResourceAsStream(
+                        "resources/" + FEATURE_AVG_DAT)));
+        for (int i = 0; i < NUM_UPMC_FEATURES; i++) {
+            String str = in.readLine();
+            StringTokenizer t = new StringTokenizer(str);
+            Double val = new Double(t.nextToken());
+            result[i] = val.doubleValue();
+        }
+        in.close();
+
+        System.out.println("feature averages: " + Arrays.toString(result));
+        
+        return result;
     }
-    
-    private void computeBDMFeatures() {
-    	// compute the projection of this ROI on w_matrix
-    	double x[] = new double[NUM_UPMC_FEATURES+1];
-    	System.arraycopy(edmf, 0, x, 0, NUM_UPMC_FEATURES);
-    	// add a threshold value
-    	x[NUM_UPMC_FEATURES] = 1.0;
-    	
-    	// subtract out average feature values
-    	for (int i = 0; i < NUM_UPMC_FEATURES; i++) {
-    		x[i] -= u_vector[i];
-    	}
-    	
-    	// BDMF = X * W 
-        for (int i = 0; i < NUM_BOOSTLDM_FEATURES; i++) {
-            for (int j = 0; j < NUM_UPMC_FEATURES+1; j++) {
-               	bdmf[i] += x[j] * w_matrix[j][i];
+
+    private double[][] readTransform() throws IOException {
+        // one extra row for thresholds
+        double result[][] = new double[NUM_UPMC_FEATURES + 1][NUM_BOOSTLDM_FEATURES];
+
+        BufferedReader in = new BufferedReader(new InputStreamReader(this
+                .getClass().getResourceAsStream("resources/" + TRANSFORM_DAT)));
+        for (int i = 0; i < NUM_UPMC_FEATURES + 1; i++) {
+            String str = in.readLine();
+            StringTokenizer t = new StringTokenizer(str);
+            for (int j = 0; j < NUM_BOOSTLDM_FEATURES; j++) {
+                Double val = new Double(t.nextToken());
+                result[i][j] = val.doubleValue();
             }
-            
-          	// now binarize this value
-           	if (bdmf[i] > 0) {
-           		bdmf[i] = 1.0;
-           	} else {
-           		bdmf[i] = -1.0;
-           	}
+        }
+        in.close();
+
+        System.out.println("transform: " + Arrays.toString(result));
+
+        return result;
+    }
+
+    private void computeBDMFeatures() {
+        // compute the projection of this ROI on w_matrix
+        double x[] = new double[NUM_UPMC_FEATURES + 1];
+        System.arraycopy(edmf, 0, x, 0, NUM_UPMC_FEATURES);
+        // add a threshold value
+        x[NUM_UPMC_FEATURES] = 1.0;
+
+        // subtract out average feature values
+        for (int i = 0; i < NUM_UPMC_FEATURES; i++) {
+            x[i] -= u_vector[i];
+        }
+
+        // BDMF = X * W
+        for (int i = 0; i < NUM_BOOSTLDM_FEATURES; i++) {
+            for (int j = 0; j < NUM_UPMC_FEATURES + 1; j++) {
+                bdmf[i] += x[j] * w_matrix[j][i];
+            }
+
+            // now binarize this value
+            if (bdmf[i] > 0) {
+                bdmf[i] = 1.0;
+            } else {
+                bdmf[i] = -1.0;
+            }
         }
     }
 
