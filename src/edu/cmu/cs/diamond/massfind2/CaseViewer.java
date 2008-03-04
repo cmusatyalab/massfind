@@ -1,4 +1,4 @@
-package edu.cmu.cs.diamond.rsna2007;
+package edu.cmu.cs.diamond.massfind2;
 
 import java.awt.*;
 import java.awt.event.*;

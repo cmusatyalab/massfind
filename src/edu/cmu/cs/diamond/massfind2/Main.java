@@ -1,4 +1,4 @@
-package edu.cmu.cs.diamond.rsna2007;
+package edu.cmu.cs.diamond.massfind2;
 
 import java.awt.*;
 import java.awt.event.ActionEvent;
@@ -21,13 +21,13 @@ import javax.swing.JLabel;
 
 import org.jdesktop.swingx.graphics.GraphicsUtilities;
 
+import edu.cmu.cs.diamond.massfind2.Truth.Biopsy;
+import edu.cmu.cs.diamond.massfind2.Truth.MassMargin;
+import edu.cmu.cs.diamond.massfind2.Truth.MassShape;
 import edu.cmu.cs.diamond.opendiamond.Scope;
 import edu.cmu.cs.diamond.opendiamond.ScopeSource;
-import edu.cmu.cs.diamond.rsna2007.Truth.Biopsy;
-import edu.cmu.cs.diamond.rsna2007.Truth.MassMargin;
-import edu.cmu.cs.diamond.rsna2007.Truth.MassShape;
 
-public class Demo extends JFrame {
+public class Main extends JFrame {
     private static final String REGION_FINDER_PATH_TXT = "region_finder_path";
 
     private static final String FILTER_DIR_TXT = "filter_dir";
@@ -49,10 +49,10 @@ public class Demo extends JFrame {
     final private JLabel caseLabel = new JLabel();
 
     public static void main(String[] args) {
-        Demo m;
+        Main m;
 
         if (args.length < 3) {
-            System.out.println("Usage: " + Demo.class.getName() + " "
+            System.out.println("Usage: " + Main.class.getName() + " "
                     + INDEX_FILE_TXT + " " + FILTER_DIR_TXT + " "
                     + REGION_FINDER_PATH_TXT);
             System.exit(1);
@@ -89,7 +89,7 @@ public class Demo extends JFrame {
                 .getDefaultScreenDevice();
 
         try {
-            m = new Demo(index, filterdir, exe, theScope);
+            m = new Main(index, filterdir, exe, theScope);
             m.setDefaultCloseOperation(JFrame.EXIT_ON_CLOSE);
             DisplayMode dm = gd.getDisplayMode();
 
@@ -107,9 +107,9 @@ public class Demo extends JFrame {
         }
     }
 
-    public Demo(File index, File filterdir, File regionFinderExe, Scope scope)
+    public Main(File index, File filterdir, File regionFinderExe, Scope scope)
             throws IOException {
-        super("Diamond RSNA 2007");
+        super("Diamond MassFind");
 
         caseViewer = new CaseViewer(filterdir, regionFinderExe, scope);
 
