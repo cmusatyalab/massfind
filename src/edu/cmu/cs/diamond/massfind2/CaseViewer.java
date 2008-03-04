@@ -313,12 +313,14 @@ public class CaseViewer extends JLayeredPane {
         JMenu subpop = new JMenu("Distance Metric");
         mr = createTypeMenu("Euclidian", SearchType.SEARCH_TYPE_EUCLIDIAN,
                 searchGroup);
-        // mr.setSelected(true);
+        mr.setSelected(true);
         subpop.add(mr);
 
+        
+        // TODO: figure out how to make this work
         mr = createTypeMenu("Boosted Learned",
                 SearchType.SEARCH_TYPE_BOOSTED_LEARNED, searchGroup);
-        mr.setSelected(true);
+//        mr.setSelected(true);
         subpop.add(mr);
         
         // not implemented yet
