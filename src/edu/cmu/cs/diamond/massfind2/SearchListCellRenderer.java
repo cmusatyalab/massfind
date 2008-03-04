@@ -30,7 +30,7 @@ public class SearchListCellRenderer extends DefaultListCellRenderer {
 
         int similarity = r.getSimilarity();
 
-        String text = Integer.toString(similarity) + "%";
+        String text = Integer.toString(similarity);
 
         c.setText(text);
 
