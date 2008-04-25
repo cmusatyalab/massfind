@@ -540,17 +540,17 @@ public class CaseViewer extends JLayeredPane {
 
             switch (searchType) {
             case SEARCH_TYPE_EUCLIDIAN:
-                filename = "libfil_euclidian.a";
+                filename = "libfil_euclidian.so";
                 data = r.getEuclidianData();
                 functionName = "euclidian";
                 break;
             case SEARCH_TYPE_BOOSTED_LEARNED:
-                filename = "libfil_boostldm.a";
+                filename = "libfil_boostldm.so";
                 data = r.getBoostedData();
                 functionName = "boostldm";
                 break;
             case SEARCH_TYPE_QUERY_ADAPTIVE_LEARNED:
-                filename = "libfil_qaldm.a";
+                filename = "libfil_qaldm.so";
                 data = r.getEuclidianData();
                 functionName = "qaldm";
                 break;
@@ -604,7 +604,7 @@ public class CaseViewer extends JLayeredPane {
                             .toString(visArgs[i]);
                 }
 
-                f = new File(filterdir, "libfil_visual.a");
+                f = new File(filterdir, "libfil_visual.so");
                 fc = new FilterCode(new FileInputStream(f));
                 ff = new Filter("visual", fc, "f_eval_visual", "f_init_visual",
                         "f_fini_visual", 1, new String[0], visArgsStr, 1);
