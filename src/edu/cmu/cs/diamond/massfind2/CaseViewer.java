@@ -114,22 +114,22 @@ public class CaseViewer extends JLayeredPane {
     private int magX;
 
     final private Scope scope;
-    
+
     final private static int SEARCH_THRESHOLD_DEFAULT = 85;
-    
+
     final private static int SEARCH_THRESHOLD_MIN = 0;
-    
+
     final private static int SEARCH_THRESHOLD_MAX = 100;
-    
+
     private int searchThreshold = SEARCH_THRESHOLD_DEFAULT;
 
     protected SearchType searchType;
 
     final private String regionFinderExe;
-    
+
     final private JCheckBoxMenuItem visSizeCheckbox = new JCheckBoxMenuItem(
-    		"ROI Size");
- 
+            "ROI Size");
+
     final private JCheckBoxMenuItem visCircularityCheckbox = new JCheckBoxMenuItem(
             "ROI Circularity");
 
@@ -269,9 +269,9 @@ public class CaseViewer extends JLayeredPane {
                 cx[i] = Double.parseDouble(st.nextToken());
                 cy[i] = Double.parseDouble(st.nextToken());
             }
-            
+
             // XXXX
-            
+
             double normdata[] = new double[38];
             i = 0;
             line = r.readLine();
@@ -279,7 +279,7 @@ public class CaseViewer extends JLayeredPane {
                 if (line == null) {
                     return null;
                 }
-               StringTokenizer st = new StringTokenizer(line);
+                StringTokenizer st = new StringTokenizer(line);
                 while (st.hasMoreTokens()) {
                     try {
                         normdata[i] = Double.parseDouble(st.nextToken());
@@ -288,10 +288,9 @@ public class CaseViewer extends JLayeredPane {
                     }
                     i++;
                 }
-                 line = r.readLine();
-            } while (i < normdata.length-2);
+                line = r.readLine();
+            } while (i < normdata.length - 2);
             normdata[37] = 1;
-
 
             return new ROI(data, cx, cy, normdata, null);
         } catch (FileNotFoundException e) {
@@ -331,53 +330,52 @@ public class CaseViewer extends JLayeredPane {
         mr.setSelected(true);
         subpop.add(mr);
 
-        
         // TODO: figure out how to make this work
         mr = createTypeMenu("Boosted Learned",
                 SearchType.SEARCH_TYPE_BOOSTED_LEARNED, searchGroup);
-//        mr.setSelected(true);
+        // mr.setSelected(true);
         subpop.add(mr);
-        
+
         // not implemented yet
-//        mr = createTypeMenu("Query Adaptive Learned",
-//                SearchType.SEARCH_TYPE_QUERY_ADAPTIVE_LEARNED, searchGroup);
-//        subpop.add(mr);
+        // mr = createTypeMenu("Query Adaptive Learned",
+        // SearchType.SEARCH_TYPE_QUERY_ADAPTIVE_LEARNED, searchGroup);
+        // subpop.add(mr);
 
         popup.add(subpop);
 
         subpop = new JMenu("Search Threshold");
-        JSlider thresholdSlider = new JSlider(JSlider.HORIZONTAL, 
-        		SEARCH_THRESHOLD_MIN, SEARCH_THRESHOLD_MAX,
-        		SEARCH_THRESHOLD_DEFAULT);
+        JSlider thresholdSlider = new JSlider(JSlider.HORIZONTAL,
+                SEARCH_THRESHOLD_MIN, SEARCH_THRESHOLD_MAX,
+                SEARCH_THRESHOLD_DEFAULT);
         thresholdSlider.setMajorTickSpacing(20);
         thresholdSlider.setMinorTickSpacing(5);
         thresholdSlider.setPaintTicks(true);
         thresholdSlider.setPaintLabels(true);
-        
+
         thresholdSlider.addChangeListener(new ChangeListener() {
-        		public void stateChanged(ChangeEvent e) {
-        			JSlider source = (JSlider)e.getSource();
-        			searchThreshold = source.getValue();
-                }
-        	});
-        
+            public void stateChanged(ChangeEvent e) {
+                JSlider source = (JSlider) e.getSource();
+                searchThreshold = source.getValue();
+            }
+        });
+
         subpop.add(thresholdSlider);
         popup.add(subpop);
-        
+
         // leave these out for now - spinners don't work
-//        subpop = new JMenu("Visual Constraints");
-//        subpop.add(visSizeCheckbox);
-//        subpop.add(visSizeMin);
-//        subpop.add(visSizeMax);
-//        subpop.addSeparator();
-//        subpop.add(visCircularityCheckbox);
-//        subpop.add(visCircularityMin);
-//        subpop.add(visCircularityMax);
-//        subpop.addSeparator();
-//        subpop.add(visShapeFactorCheckbox);
-//        subpop.add(visShapeFactorMin);
-//        subpop.add(visShapeFactorMax);
-//        popup.add(subpop);
+        // subpop = new JMenu("Visual Constraints");
+        // subpop.add(visSizeCheckbox);
+        // subpop.add(visSizeMin);
+        // subpop.add(visSizeMax);
+        // subpop.addSeparator();
+        // subpop.add(visCircularityCheckbox);
+        // subpop.add(visCircularityMin);
+        // subpop.add(visCircularityMax);
+        // subpop.addSeparator();
+        // subpop.add(visShapeFactorCheckbox);
+        // subpop.add(visShapeFactorMin);
+        // subpop.add(visShapeFactorMax);
+        // popup.add(subpop);
 
         popup.addSeparator();
 
@@ -416,9 +414,9 @@ public class CaseViewer extends JLayeredPane {
         searchGroup.add(mr);
         return mr;
     }
-    
+
     private void addCheckBoxMenuItem(JMenu menu, String name, boolean selected) {
- 
+
     }
 
     public void setCase(Case theCase) {

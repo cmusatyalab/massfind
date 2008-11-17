@@ -43,8 +43,8 @@ public class Truth {
 
     final private ROI roi;
 
-    public Truth(int birad, int subtlety, int density, int age,
-            Biopsy biopsy, MassShape shape, MassMargin margin, ROI roi) {
+    public Truth(int birad, int subtlety, int density, int age, Biopsy biopsy,
+            MassShape shape, MassMargin margin, ROI roi) {
         this.birad = birad;
         this.subtlety = subtlety;
         this.density = density;

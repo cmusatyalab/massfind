@@ -17,11 +17,7 @@ package edu.cmu.cs.diamond.massfind2;
 import java.awt.Component;
 import java.awt.image.BufferedImage;
 
-import javax.swing.BorderFactory;
-import javax.swing.DefaultListCellRenderer;
-import javax.swing.ImageIcon;
-import javax.swing.JList;
-import javax.swing.SwingConstants;
+import javax.swing.*;
 import javax.swing.border.Border;
 
 public class SearchListCellRenderer extends DefaultListCellRenderer {

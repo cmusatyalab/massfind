@@ -130,7 +130,7 @@ public class SearchPanel extends JPanel implements ListSelectionListener {
         }
 
         theSearch = s;
-        
+
         deregisterListener();
 
         list.setModel(new SearchModel(theSearch, Integer.MAX_VALUE));

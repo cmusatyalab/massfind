@@ -108,8 +108,8 @@ final public class SearchModel extends AbstractListModel implements
 
     final protected static Comparator<MassResult> comparator = new Comparator<MassResult>() {
         public int compare(MassResult o1, MassResult o2) {
-            return Integer.valueOf(o2.getSimilarity()).compareTo(Integer.valueOf(o1
-                    .getSimilarity()));
+            return Integer.valueOf(o2.getSimilarity()).compareTo(
+                    Integer.valueOf(o1.getSimilarity()));
         }
     };
 

@@ -84,13 +84,14 @@ public class Main extends JFrame {
         }
 
         if (!(filterdir.canRead() && filterdir.isDirectory())) {
-            System.out.println("error: " + FILTER_DIR_TXT + " must be readable directory");
+            System.out.println("error: " + FILTER_DIR_TXT
+                    + " must be readable directory");
             System.exit(1);
         }
 
         if (!(exe.canRead() && exe.isFile())) {
-            System.out
-                    .println("error: " + REGION_FINDER_PATH_TXT + " must be executable file");
+            System.out.println("error: " + REGION_FINDER_PATH_TXT
+                    + " must be executable file");
             System.exit(1);
         }
 

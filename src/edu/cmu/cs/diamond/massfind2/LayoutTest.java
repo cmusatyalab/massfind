@@ -14,11 +14,7 @@
 
 package edu.cmu.cs.diamond.massfind2;
 
-import java.awt.Color;
-import java.awt.Container;
-import java.awt.Dimension;
-import java.awt.FontMetrics;
-import java.awt.Graphics;
+import java.awt.*;
 
 import javax.swing.Box;
 import javax.swing.JFrame;
@@ -56,12 +52,12 @@ public class LayoutTest extends JFrame {
 
     private void doBox() {
         Box h = Box.createHorizontalBox();
-        
+
         SizePanel j1 = makeSizePanel1();
         h.add(j1);
 
         h.add(Box.createHorizontalStrut(10));
-        
+
         SizePanel j2 = makeSizePanel2();
         h.add(j2);
 

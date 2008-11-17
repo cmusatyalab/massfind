@@ -45,10 +45,10 @@ public class Banner extends JPanel {
         public Logo(BufferedImage image) {
             this.image = image;
             int w = image.getWidth();
-//            int h = image.getHeight();
+            // int h = image.getHeight();
             setPreferredSize(new Dimension(w, 150));
-//            setMinimumSize(new Dimension(10, h / 2));
-//            setMaximumSize(new Dimension(100, h * 2));
+            // setMinimumSize(new Dimension(10, h / 2));
+            // setMaximumSize(new Dimension(100, h * 2));
             setBorder(BorderFactory.createEmptyBorder(10, 10, 10, 10));
         }
 
@@ -76,11 +76,12 @@ public class Banner extends JPanel {
             final int w = image.getWidth();
             final int h = image.getHeight();
 
-            BufferedImage tmp = new BufferedImage(w, h, BufferedImage.TYPE_INT_RGB);
+            BufferedImage tmp = new BufferedImage(w, h,
+                    BufferedImage.TYPE_INT_RGB);
             Graphics2D g2 = tmp.createGraphics();
             g2.drawImage(image, 0, 0, null);
             g2.dispose();
-            
+
             scale = Util.getScaleForResize(w, h, cW, cH);
 
             final int sW = (int) (w * scale);

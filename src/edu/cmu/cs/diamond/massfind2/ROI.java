@@ -244,7 +244,7 @@ public class ROI {
         in.close();
 
         System.out.println("feature averages: " + Arrays.toString(result));
-        
+
         return result;
     }
 
