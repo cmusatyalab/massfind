@@ -1,3 +1,17 @@
+/*
+ * MassFind 2: A Diamond application for exploration of breast tumors
+ *
+ * Copyright (c) 2007-2008 Carnegie Mellon University. All rights reserved.
+ * Additional copyrights may be listed below.
+ *
+ * This program and the accompanying materials are made available under
+ * the terms of the Eclipse Public License v1.0 which accompanies this
+ * distribution in the file named LICENSE.
+ *
+ * Technical and financial contributors are listed in the file named
+ * CREDITS.
+ */
+
 package edu.cmu.cs.diamond.massfind2;
 
 import java.awt.*;
