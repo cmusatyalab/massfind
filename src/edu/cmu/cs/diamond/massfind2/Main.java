@@ -42,8 +42,6 @@ import edu.cmu.cs.diamond.opendiamond.Scope;
 import edu.cmu.cs.diamond.opendiamond.ScopeSource;
 
 public class Main extends JFrame {
-    private static final String REGION_FINDER_PATH_TXT = "region_finder_path";
-
     private static final String FILTER_DIR_TXT = "filter_dir";
 
     private static final String INDEX_FILE_TXT = "index_file";
@@ -65,16 +63,15 @@ public class Main extends JFrame {
     public static void main(String[] args) {
         Main m;
 
-        if (args.length < 3) {
+        if (args.length < 2) {
             System.out.println("Usage: " + Main.class.getName() + " "
-                    + INDEX_FILE_TXT + " " + FILTER_DIR_TXT + " "
-                    + REGION_FINDER_PATH_TXT);
+                    + INDEX_FILE_TXT + " " + FILTER_DIR_TXT);
             System.exit(1);
         }
 
         File index = new File(args[0]);
         File filterdir = new File(args[1]);
-        File exe = new File(args[2]);
+        File exe = new File(index.getParent(), "CAD_RegionGrowth.exe");
 
         // verify files
         if (!(index.canRead() && index.isFile())) {
@@ -90,7 +87,7 @@ public class Main extends JFrame {
         }
 
         if (!(exe.canRead() && exe.isFile())) {
-            System.out.println("error: " + REGION_FINDER_PATH_TXT
+            System.out.println("error: " + exe.toString()
                     + " must be executable file");
             System.exit(1);
         }
