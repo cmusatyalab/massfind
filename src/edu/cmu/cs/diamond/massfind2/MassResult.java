@@ -20,7 +20,6 @@ import java.awt.Graphics2D;
 import java.awt.image.BufferedImage;
 import java.io.ByteArrayInputStream;
 import java.io.IOException;
-import java.util.List;
 
 import javax.imageio.ImageIO;
 
@@ -29,7 +28,7 @@ import org.jdesktop.swingx.graphics.GraphicsUtilities;
 import edu.cmu.cs.diamond.opendiamond.Result;
 import edu.cmu.cs.diamond.opendiamond.Util;
 
-public class MassResult extends Result {
+public class MassResult {
     final private Result theResult;
 
     final private BufferedImage thumbnail;
@@ -97,31 +96,6 @@ public class MassResult extends Result {
 
     public boolean isMalignant() {
         return malignant;
-    }
-
-    @Override
-    public byte[] getData() {
-        return theResult.getData();
-    }
-
-    @Override
-    public List<String> getKeys() {
-        return theResult.getKeys();
-    }
-
-    @Override
-    public String getObjectName() {
-        return theResult.getObjectName();
-    }
-
-    @Override
-    public String getServerName() {
-        return theResult.getServerName();
-    }
-
-    @Override
-    public byte[] getValue(String key) {
-        return theResult.getValue(key);
     }
 
     public BufferedImage getImage() {
