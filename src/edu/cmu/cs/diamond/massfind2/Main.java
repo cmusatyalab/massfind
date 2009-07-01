@@ -38,8 +38,6 @@ import org.jdesktop.swingx.graphics.GraphicsUtilities;
 import edu.cmu.cs.diamond.massfind2.Truth.Biopsy;
 import edu.cmu.cs.diamond.massfind2.Truth.MassMargin;
 import edu.cmu.cs.diamond.massfind2.Truth.MassShape;
-import edu.cmu.cs.diamond.opendiamond.Scope;
-import edu.cmu.cs.diamond.opendiamond.ScopeSource;
 
 public class Main extends JFrame {
     private static final String FILTER_DIR_TXT = "filter_dir";
@@ -92,16 +90,11 @@ public class Main extends JFrame {
             System.exit(1);
         }
 
-        // load scope
-        ScopeSource.commitScope();
-        List<Scope> scopes = ScopeSource.getPredefinedScopeList();
-        Scope theScope = scopes.get(0);
-
         GraphicsDevice gd = GraphicsEnvironment.getLocalGraphicsEnvironment()
                 .getDefaultScreenDevice();
 
         try {
-            m = new Main(index, filterdir, exe, theScope);
+            m = new Main(index, filterdir, exe);
             m.setDefaultCloseOperation(JFrame.EXIT_ON_CLOSE);
             DisplayMode dm = gd.getDisplayMode();
 
@@ -119,11 +112,11 @@ public class Main extends JFrame {
         }
     }
 
-    public Main(File index, File filterdir, File regionFinderExe, Scope scope)
+    public Main(File index, File filterdir, File regionFinderExe)
             throws IOException {
         super("Diamond MassFind");
 
-        caseViewer = new CaseViewer(filterdir, regionFinderExe, scope);
+        caseViewer = new CaseViewer(filterdir, regionFinderExe);
 
         setMinimumSize(new Dimension(800, 600));
 

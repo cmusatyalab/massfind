@@ -25,7 +25,10 @@ import javax.swing.*;
 import javax.swing.event.ChangeEvent;
 import javax.swing.event.ChangeListener;
 
-import edu.cmu.cs.diamond.opendiamond.*;
+import edu.cmu.cs.diamond.opendiamond.Filter;
+import edu.cmu.cs.diamond.opendiamond.FilterCode;
+import edu.cmu.cs.diamond.opendiamond.Search;
+import edu.cmu.cs.diamond.opendiamond.Searchlet;
 
 public class CaseViewer extends JLayeredPane {
     private final static int SPACING = 10;
@@ -113,8 +116,6 @@ public class CaseViewer extends JLayeredPane {
 
     private int magX;
 
-    final private Scope scope;
-
     final private static int SEARCH_THRESHOLD_DEFAULT = 85;
 
     final private static int SEARCH_THRESHOLD_MIN = 0;
@@ -154,11 +155,8 @@ public class CaseViewer extends JLayeredPane {
     final private JSpinner visShapeFactorMax = new JSpinner(
             new SpinnerNumberModel(1.0, 1.0, 10.0, 0.1));
 
-    public CaseViewer(File filterdir, File regionFinderExe, Scope scope)
-            throws IOException {
+    public CaseViewer(File filterdir, File regionFinderExe) throws IOException {
         super();
-
-        this.scope = scope;
 
         this.regionFinderExe = regionFinderExe.getCanonicalPath();
 
@@ -526,7 +524,7 @@ public class CaseViewer extends JLayeredPane {
 
         Search search = Search.getSharedInstance();
         // TODO fill in search parameters
-        search.setScope(scope);
+        search.defineScope();
         search.setSearchlet(prepareSearchlet(r));
 
         SearchPanel s;
