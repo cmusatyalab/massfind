@@ -106,36 +106,21 @@ public class SearchPanel extends JPanel implements ListSelectionListener {
         super.setVisible(visible);
         if (oldVisible != visible && !visible) {
             if (theSearch != null) {
-                theSearch.stop();
+                theSearch.close();
             }
-
-            // deregister listeners
-            deregisterListener();
 
             caseViewer.setSelectedResult(null);
         }
     }
 
-    private void deregisterListener() {
-        ListModel oldModel = list.getModel();
-        if (oldModel instanceof SearchModel) {
-            SearchModel m = (SearchModel) oldModel;
-            m.removeSearchListener();
-        }
-    }
-
     void beginSearch(Search s) {
         if (theSearch != null) {
-            theSearch.stop();
+            theSearch.close();
         }
 
         theSearch = s;
 
-        deregisterListener();
-
         list.setModel(new SearchModel(theSearch, Integer.MAX_VALUE));
-
-        theSearch.start();
 
         setVisible(true);
     }

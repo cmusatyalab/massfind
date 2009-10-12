@@ -19,16 +19,19 @@ import java.awt.*;
 import java.awt.event.*;
 import java.awt.image.BufferedImage;
 import java.io.*;
+import java.util.ArrayList;
+import java.util.Arrays;
 import java.util.StringTokenizer;
 
 import javax.swing.*;
 import javax.swing.event.ChangeEvent;
 import javax.swing.event.ChangeListener;
 
+import edu.cmu.cs.diamond.opendiamond.Cookie;
 import edu.cmu.cs.diamond.opendiamond.Filter;
 import edu.cmu.cs.diamond.opendiamond.FilterCode;
 import edu.cmu.cs.diamond.opendiamond.Search;
-import edu.cmu.cs.diamond.opendiamond.Searchlet;
+import edu.cmu.cs.diamond.opendiamond.SearchFactory;
 
 public class CaseViewer extends JLayeredPane {
     private final static int SPACING = 10;
@@ -313,7 +316,13 @@ public class CaseViewer extends JLayeredPane {
         m = new JMenuItem("Search");
         m.addActionListener(new ActionListener() {
             public void actionPerformed(ActionEvent e) {
-                doSearch(ov);
+                try {
+                    doSearch(ov);
+                } catch (IOException e1) {
+                    e1.printStackTrace();
+                } catch (InterruptedException e1) {
+                    e1.printStackTrace();
+                }
             }
         });
         popup.add(m);
@@ -387,7 +396,7 @@ public class CaseViewer extends JLayeredPane {
         return popup;
     }
 
-    public void doSearch(OneView ov) {
+    public void doSearch(OneView ov) throws IOException, InterruptedException {
         // search
         ROI r = ov.getROI();
 
@@ -518,14 +527,14 @@ public class CaseViewer extends JLayeredPane {
         return views;
     }
 
-    public void startSearch(OneView view, ROI r) {
+    public void startSearch(OneView view, ROI r) throws IOException,
+            InterruptedException {
         System.out.println("start search");
         searchPanelOnRight = (view == views[0] || view == views[1]);
 
-        Search search = Search.getSharedInstance();
+        SearchFactory factory = createFactory(r);
+        Search search = factory.createSearch(null);
         // TODO fill in search parameters
-        search.defineScope();
-        search.setSearchlet(prepareSearchlet(r));
 
         SearchPanel s;
         if (searchPanelOnRight) {
@@ -541,8 +550,8 @@ public class CaseViewer extends JLayeredPane {
         SEARCH_TYPE_EUCLIDIAN, SEARCH_TYPE_BOOSTED_LEARNED, SEARCH_TYPE_QUERY_ADAPTIVE_LEARNED
     }
 
-    private Searchlet prepareSearchlet(ROI r) {
-        Searchlet s = new Searchlet();
+    private SearchFactory createFactory(ROI r) {
+        SearchFactory factory = null;
 
         try {
             String filename;
@@ -576,11 +585,14 @@ public class CaseViewer extends JLayeredPane {
                 args[i] = Double.toString(data[i]);
             }
 
+            java.util.List<Filter> filters = new ArrayList<Filter>();
+
             FilterCode fc = new FilterCode(new FileInputStream(f));
             Filter ff = new Filter("filter", fc, "f_eval_" + functionName,
                     "f_init_" + functionName, "f_fini_" + functionName,
-                    searchThreshold, new String[] {}, args, 1);
-            s.addFilter(ff);
+                    searchThreshold, Arrays.asList(new String[] {}), Arrays
+                            .asList(args), 1);
+            filters.add(ff);
 
             if (visSizeCheckbox.isSelected()
                     || visCircularityCheckbox.isSelected()
@@ -618,20 +630,21 @@ public class CaseViewer extends JLayeredPane {
                 f = new File(filterdir, "libfil_visual.so");
                 fc = new FilterCode(new FileInputStream(f));
                 ff = new Filter("visual", fc, "f_eval_visual", "f_init_visual",
-                        "f_fini_visual", 1, new String[0], visArgsStr, 1);
-                s.addFilter(ff);
+                        "f_fini_visual", 1, Arrays.asList(new String[0]),
+                        Arrays.asList(visArgsStr), 1);
+                filters.add(ff);
             }
 
-            s.setApplicationDependencies(new String[] { "filter" });
-
-            System.out.println(s);
+            factory = new SearchFactory(filters, Arrays
+                    .asList(new String[] { "filter" }), Cookie
+                    .createDefaultCookieMap());
         } catch (FileNotFoundException e) {
             e.printStackTrace();
         } catch (IOException e) {
             e.printStackTrace();
         }
 
-        return s;
+        return factory;
     }
 
     public void setSelectedResult(MassResult result) {

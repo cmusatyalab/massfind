@@ -14,6 +14,7 @@
 
 package edu.cmu.cs.diamond.massfind2;
 
+import java.io.IOException;
 import java.util.Collections;
 import java.util.Comparator;
 import java.util.LinkedList;
@@ -24,18 +25,11 @@ import javax.swing.SwingUtilities;
 
 import edu.cmu.cs.diamond.opendiamond.Result;
 import edu.cmu.cs.diamond.opendiamond.Search;
-import edu.cmu.cs.diamond.opendiamond.SearchEvent;
-import edu.cmu.cs.diamond.opendiamond.SearchEventListener;
 
-final public class SearchModel extends AbstractListModel implements
-        SearchEventListener {
-    protected volatile boolean running;
-
+final public class SearchModel extends AbstractListModel {
     final protected Search search;
 
     final protected int limit;
-
-    final protected Object lock = new Object();
 
     final protected List<MassResult> list = new LinkedList<MassResult>();
 
@@ -43,25 +37,11 @@ final public class SearchModel extends AbstractListModel implements
         this.search = search;
         this.limit = limit;
 
-        search.addSearchEventListener(this);
-
         Thread t = new Thread(new Runnable() {
             public void run() {
-                // wait for start
-                synchronized (lock) {
-                    while (!running) {
-                        try {
-                            System.out.println("waiting for start signal");
-                            lock.wait();
-                        } catch (InterruptedException e) {
-                            e.printStackTrace();
-                        }
-                    }
-                }
-
                 try {
                     int i = 0;
-                    while (running && i < SearchModel.this.limit) {
+                    while (i < SearchModel.this.limit) {
                         final Result r = SearchModel.this.search
                                 .getNextResult();
                         if (r == null) {
@@ -80,30 +60,15 @@ final public class SearchModel extends AbstractListModel implements
                         i++;
                     }
                 } catch (InterruptedException e) {
+                } catch (IOException e) {
+                    e.printStackTrace();
                 } finally {
                     System.out.println("search done");
-                    running = false;
                 }
             }
         });
         t.setDaemon(true);
         t.start();
-    }
-
-    public void searchStarted(SearchEvent e) {
-        synchronized (lock) {
-            System.out.println("sending start notify");
-            running = true;
-            lock.notify();
-        }
-    }
-
-    public void searchStopped(SearchEvent e) {
-        running = false;
-    }
-
-    public void removeSearchListener() {
-        search.removeSearchEventListener(this);
     }
 
     final protected static Comparator<MassResult> comparator = new Comparator<MassResult>() {
