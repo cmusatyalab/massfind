@@ -27,11 +27,7 @@ import javax.swing.*;
 import javax.swing.event.ChangeEvent;
 import javax.swing.event.ChangeListener;
 
-import edu.cmu.cs.diamond.opendiamond.Cookie;
-import edu.cmu.cs.diamond.opendiamond.Filter;
-import edu.cmu.cs.diamond.opendiamond.FilterCode;
-import edu.cmu.cs.diamond.opendiamond.Search;
-import edu.cmu.cs.diamond.opendiamond.SearchFactory;
+import edu.cmu.cs.diamond.opendiamond.*;
 
 public class CaseViewer extends JLayeredPane {
     private final static int SPACING = 10;
@@ -636,7 +632,7 @@ public class CaseViewer extends JLayeredPane {
             }
 
             factory = new SearchFactory(filters, Arrays
-                    .asList(new String[] { "filter" }), Cookie
+                    .asList(new String[] { "filter" }), CookieMap
                     .createDefaultCookieMap());
         } catch (FileNotFoundException e) {
             e.printStackTrace();
