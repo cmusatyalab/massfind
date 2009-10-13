@@ -106,14 +106,18 @@ public class SearchPanel extends JPanel implements ListSelectionListener {
         super.setVisible(visible);
         if (oldVisible != visible && !visible) {
             if (theSearch != null) {
-                theSearch.close();
+                try {
+                    theSearch.close();
+                } catch (InterruptedException e) {
+                    Thread.currentThread().interrupt();
+                }
             }
 
             caseViewer.setSelectedResult(null);
         }
     }
 
-    void beginSearch(Search s) {
+    void beginSearch(Search s) throws InterruptedException {
         if (theSearch != null) {
             theSearch.close();
         }
