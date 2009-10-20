@@ -181,7 +181,7 @@ public class Main extends JFrame {
     }
 
     private void readIndex(File file) throws FileNotFoundException, IOException {
-        File dir = file.getParentFile();
+        File dir = file.getAbsoluteFile().getParentFile();
         String line;
 
         System.out.println("Reading truthfile");
