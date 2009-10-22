@@ -587,7 +587,7 @@ public class CaseViewer extends JLayeredPane {
             Filter ff = new Filter("filter", fc, "f_eval_" + functionName,
                     "f_init_" + functionName, "f_fini_" + functionName,
                     searchThreshold, Arrays.asList(new String[] {}), Arrays
-                            .asList(args), 1);
+                            .asList(args));
             filters.add(ff);
 
             if (visSizeCheckbox.isSelected()
@@ -627,7 +627,7 @@ public class CaseViewer extends JLayeredPane {
                 fc = new FilterCode(new FileInputStream(f));
                 ff = new Filter("visual", fc, "f_eval_visual", "f_init_visual",
                         "f_fini_visual", 1, Arrays.asList(new String[0]),
-                        Arrays.asList(visArgsStr), 1);
+                        Arrays.asList(visArgsStr));
                 filters.add(ff);
             }
 
