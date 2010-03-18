@@ -18,7 +18,7 @@ import java.awt.*;
 
 import javax.swing.*;
 
-public class MagnifierWindow extends JWindow {
+public class MagnifierWindow extends JFrame {
     private final int magnifierSize;
 
     protected class Magnifier extends JComponent {
@@ -105,6 +105,7 @@ public class MagnifierWindow extends JWindow {
 
     public MagnifierWindow(CaseViewer viewer, int magnifierSize) {
         super();
+        setUndecorated(true);
         setBackground(Color.BLACK);
         getContentPane().setBackground(null);
         setCursor(CaseViewer.hiddenCursor);
