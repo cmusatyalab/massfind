@@ -552,23 +552,19 @@ public class CaseViewer extends JLayeredPane {
         try {
             String filename;
             double data[];
-            String functionName;
 
             switch (searchType) {
             case SEARCH_TYPE_EUCLIDIAN:
-                filename = "libfil_euclidian.so";
+                filename = "fil_euclidian";
                 data = r.getEuclidianData();
-                functionName = "euclidian";
                 break;
             case SEARCH_TYPE_BOOSTED_LEARNED:
-                filename = "libfil_boostldm.so";
+                filename = "fil_boostldm";
                 data = r.getBoostedData();
-                functionName = "boostldm";
                 break;
             case SEARCH_TYPE_QUERY_ADAPTIVE_LEARNED:
-                filename = "libfil_qaldm.so";
+                filename = "fil_qaldm";
                 data = r.getEuclidianData();
-                functionName = "qaldm";
                 break;
             default:
                 throw new RuntimeException("searchType not valid: "
@@ -584,10 +580,8 @@ public class CaseViewer extends JLayeredPane {
             java.util.List<Filter> filters = new ArrayList<Filter>();
 
             FilterCode fc = new FilterCode(new FileInputStream(f));
-            Filter ff = new Filter("filter", fc, "f_eval_" + functionName,
-                    "f_init_" + functionName, "f_fini_" + functionName,
-                    searchThreshold, Arrays.asList(new String[] {}), Arrays
-                            .asList(args));
+            Filter ff = new Filter("filter", fc, searchThreshold,
+                    Arrays.asList(new String[] {}), Arrays.asList(args));
             filters.add(ff);
 
             if (visSizeCheckbox.isSelected()
@@ -623,10 +617,9 @@ public class CaseViewer extends JLayeredPane {
                             .toString(visArgs[i]);
                 }
 
-                f = new File(filterdir, "libfil_visual.so");
+                f = new File(filterdir, "fil_visual");
                 fc = new FilterCode(new FileInputStream(f));
-                ff = new Filter("visual", fc, "f_eval_visual", "f_init_visual",
-                        "f_fini_visual", 1, Arrays.asList(new String[0]),
+                ff = new Filter("visual", fc, 1, Arrays.asList(new String[0]),
                         Arrays.asList(visArgsStr));
                 filters.add(ff);
             }
