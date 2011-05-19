@@ -624,9 +624,8 @@ public class CaseViewer extends JLayeredPane {
                 filters.add(ff);
             }
 
-            factory = new SearchFactory(filters, Arrays
-                    .asList(new String[] { "filter" }), CookieMap
-                    .createDefaultCookieMap());
+            factory = new SearchFactory(filters,
+                    CookieMap.createDefaultCookieMap());
         } catch (FileNotFoundException e) {
             e.printStackTrace();
         } catch (IOException e) {
