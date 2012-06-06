@@ -167,7 +167,8 @@ public class CaseViewer extends JLayeredPane {
         DisplayMode dm = GraphicsEnvironment.getLocalGraphicsEnvironment()
                 .getDefaultScreenDevice().getDisplayMode();
         final int magnifierSize;
-        if (dm.getWidth() < 1280 || dm.getHeight() < 1024) {
+        // on some machines, getDisplayMode() illegally returns null
+        if (dm == null || dm.getWidth() < 1280 || dm.getHeight() < 1024) {
             magnifierSize = 256;
         } else {
             magnifierSize = 512;
