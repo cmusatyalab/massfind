@@ -90,17 +90,14 @@ public class Main extends JFrame {
             System.exit(1);
         }
 
-        GraphicsDevice gd = GraphicsEnvironment.getLocalGraphicsEnvironment()
-                .getDefaultScreenDevice();
-
         try {
             m = new Main(index, filterdir, exe);
             m.setDefaultCloseOperation(JFrame.EXIT_ON_CLOSE);
-            DisplayMode dm = gd.getDisplayMode();
+            Dimension dim = Toolkit.getDefaultToolkit().getScreenSize();
 
             if (FULL_SCREEN) {
                 m.setUndecorated(true);
-                m.setBounds(0, 0, dm.getWidth(), dm.getHeight());
+                m.setBounds(0, 0, dim.width, dim.height);
             } else {
                 m.setSize(m.getMinimumSize());
             }
